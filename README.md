@@ -8,5 +8,6 @@ The user will be able to register and log workouts corresponding to a date to tr
 # Members
 1. Vivek Aher
 2. Anurag Kelkar
+3. Rishitha Adepu
 
  
