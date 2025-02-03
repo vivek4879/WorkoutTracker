@@ -16,6 +16,11 @@ type Users struct {
 	Password  string
 }
 
+type UserLogin struct {
+	Email    string
+	Password string
+}
+
 func (u MyModel) Insert(FirstName string, LastName string, Email string, Password string) error {
 	user := Users{
 
@@ -30,4 +35,13 @@ func (u MyModel) Insert(FirstName string, LastName string, Email string, Passwor
 		return res.Error
 	}
 	return nil
+}
+
+func (u MyModel) Query(Email string) (*UserLogin, error) {
+	var user UserLogin
+	res := u.db.Table("users").Select("email,password").Where("email = ?", Email).First(&user)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &user, nil
 }
