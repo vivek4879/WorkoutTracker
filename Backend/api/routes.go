@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/alexedwards/argon2id"
+	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 	"runtime"
+	"time"
 )
 
 func hashing(password string) string {
@@ -43,7 +45,9 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword := hashing(input.Password)
 	err := app.Models.UserModel.Insert(input.FirstName, input.LastName, input.Email, hashedPassword)
+	fmt.Println("User created")
 	if err != nil {
+		fmt.Println("here")
 		fmt.Println(err)
 	}
 }
@@ -67,14 +71,68 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	match, err := argon2id.ComparePasswordAndHash(input.Password, user.Password)
 	if err != nil {
 		log.Printf("Incorrect Password for user: %s ", user.Email)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	log.Printf("User %s matches %t ", user.Email, match)
-}
+	//Create new random session token
+	sessionToken := uuid.NewString()
+	expiresAt := time.Now().Add(48 * time.Hour)
 
+	//We will add the token to our session table
+	//var Session struct {
+	//	Userid uint      `json:"userid"`
+	//	Token  string    `json:"token"`
+	//	Expiry time.Time `json:"expiry"`
+	//}
+	//json.NewDecoder(r.Body).Decode(&Session)
+	err1 := app.Models.UserModel.INSERTSESSION(user.Userid, sessionToken, expiresAt)
+	if err1 != nil {
+		fmt.Println(err1)
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   sessionToken,
+		Expires: expiresAt,
+	})
+
+}
+func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Error(w, "No session token cookie", http.StatusUnauthorized)
+			//w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Bad Request:Invalid Cookie", http.StatusBadRequest)
+		//w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	sessionToken := c.Value
+	s, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
+	if err2 != nil {
+		http.Error(w, "Unauthorized: Session not found", http.StatusBadRequest)
+		//w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if s.Expiry.Before(time.Now()) {
+		err3 := app.Models.UserModel.DeleteSession(*s)
+		if err3 != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			//w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Unauthorized: Session expired", http.StatusUnauthorized)
+		//w.WriteHeader(http.StatusUnauthorized
+		return
+	}
+	w.Write([]byte("Welcome to the home page!\n"))
+}
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
 	router.HandlerFunc(http.MethodPost, "/login", app.loginHandler)
+	router.HandlerFunc(http.MethodGet, "/welcome", app.welcomeHandler)
 	return router
 }
