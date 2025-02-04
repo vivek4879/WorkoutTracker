@@ -26,6 +26,32 @@ func hashing(password string) string {
 	}
 	return hash
 }
+func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			http.Error(w, "No session token cookie", http.StatusUnauthorized)
+			return
+		}
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	sessionToken := c.Value
+	s, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
+	if err2 != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	err3 := app.Models.UserModel.DeleteSession(*s)
+	if err3 != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	//http.Error(w, "Unauthorized:Session expired", http.StatusUnauthorized)
+
+	fmt.Println("User sussessfully logged out")
+	return
+}
 
 func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
@@ -79,13 +105,6 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString()
 	expiresAt := time.Now().Add(48 * time.Hour)
 
-	//We will add the token to our session table
-	//var Session struct {
-	//	Userid uint      `json:"userid"`
-	//	Token  string    `json:"token"`
-	//	Expiry time.Time `json:"expiry"`
-	//}
-	//json.NewDecoder(r.Body).Decode(&Session)
 	err1 := app.Models.UserModel.INSERTSESSION(user.Userid, sessionToken, expiresAt)
 	if err1 != nil {
 		fmt.Println(err1)
@@ -134,5 +153,6 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
 	router.HandlerFunc(http.MethodPost, "/login", app.loginHandler)
 	router.HandlerFunc(http.MethodGet, "/welcome", app.welcomeHandler)
+	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
 	return router
 }
