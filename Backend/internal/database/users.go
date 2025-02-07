@@ -77,7 +77,24 @@ func (u MyModel) Query(Email string) (*UserLogin, error) {
 	return &user, nil
 }
 
+func (u MyModel) Find(Email string) (*Users, error) {
+	var user Users
+	res := u.db.Table("users").Where("email = ?", Email).First(&user)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &user, nil
+}
+
 func (u MyModel) DeleteSession(s Sessions) error {
+	res := u.db.Delete(&s)
+	if res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
+
+func (u MyModel) DeleteUser(s Users) error {
 	res := u.db.Delete(&s)
 	if res.Error != nil {
 		return res.Error

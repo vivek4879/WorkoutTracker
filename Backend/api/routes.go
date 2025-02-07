@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/alexedwards/argon2id"
 	"github.com/google/uuid"
@@ -49,7 +50,7 @@ func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//http.Error(w, "Unauthorized:Session expired", http.StatusUnauthorized)
 
-	fmt.Println("User sussessfully logged out")
+	fmt.Println("User successfully logged out")
 	return
 }
 
@@ -116,43 +117,89 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
-func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("session_token")
+func (app *application) CheckCookie(w http.ResponseWriter, r *http.Request) (string, error) {
+	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
 			http.Error(w, "No session token cookie", http.StatusUnauthorized)
-			//w.WriteHeader(http.StatusUnauthorized)
-			return
+			return "", errors.New("No session token cookie")
 		}
-		http.Error(w, "Bad Request:Invalid Cookie", http.StatusBadRequest)
-		//w.WriteHeader(http.StatusBadRequest)
-		return
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return "", err
 	}
-	sessionToken := c.Value
-	s, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
-	if err2 != nil {
-		http.Error(w, "Unauthorized: Session not found", http.StatusBadRequest)
-		//w.WriteHeader(http.StatusUnauthorized)
-		return
+	return cookie.Value, nil
+}
+
+func (app *application) CheckToken(w http.ResponseWriter, sessionToken string) (*string, error) {
+	s, err := app.Models.UserModel.QUERYSESSION(sessionToken)
+	if err != nil {
+		http.Error(w, "Unauthorized: Session not found", http.StatusUnauthorized)
+		return nil, err
 	}
 	if s.Expiry.Before(time.Now()) {
-		err3 := app.Models.UserModel.DeleteSession(*s)
-		if err3 != nil {
+		err1 := app.Models.UserModel.DeleteSession(*s)
+		if err1 != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			//w.WriteHeader(http.StatusUnauthorized)
-			return
+			return nil, err1
 		}
 		http.Error(w, "Unauthorized: Session expired", http.StatusUnauthorized)
-		//w.WriteHeader(http.StatusUnauthorized
-		return
+		return nil, errors.New("session expired")
 	}
-	w.Write([]byte("Welcome to the home page!\n"))
+	return &s.Token, nil
 }
+
+func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
+	sessionToken, err := app.CheckCookie(w, r)
+	if err != nil {
+		return // Exit early if error occurs
+	}
+
+	_, err3 := app.CheckToken(w, sessionToken)
+	if err3 != nil {
+		return // Exit early if token is invalid
+	}
+
+	fmt.Println("Welcome to the home page")
+	_, writeErr := w.Write([]byte("Welcome to the home page!\n"))
+	if writeErr != nil {
+		fmt.Println("Error writing response:", writeErr)
+	}
+}
+
+//func (app *application) deletehandler(w http.ResponseWriter, r *http.Request) {
+//	sessionToken, err := app.CheckCookie(w, r)
+//	if err != nil {
+//		return // Exit early if error occurs
+//	}
+//
+//	_, err3 := app.CheckToken(w, sessionToken)
+//	if err3 != nil {
+//		return // Exit early if token is invalid
+//	}
+//	var input struct {
+//		Email    string `json:"email"`
+//		Password string `json:"password"`
+//	}
+//	dec := json.NewDecoder(r.Body)
+//	err := dec.Decode(&input)
+//	if err != nil {
+//		http.Error(w, err.Error(), http.StatusBadRequest)
+//		return
+//	}
+//	user, err := app.Models.UserModel.Query(input.Email)
+//	if err != nil {
+//		fmt.Println(err)
+//		return
+//	}
+//	user, err2 := app.Models.UserModel.Find()
+//}
+
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
 	router.HandlerFunc(http.MethodPost, "/login", app.loginHandler)
 	router.HandlerFunc(http.MethodGet, "/welcome", app.welcomeHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
+	//router.HandlerFunc(http.MethodDelete, "/deleteaccount", app.deletehandler)
 	return router
 }
