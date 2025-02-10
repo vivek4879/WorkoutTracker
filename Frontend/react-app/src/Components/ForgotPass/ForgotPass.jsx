@@ -8,6 +8,10 @@ const ForgotPass = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if(email.length <= 0) {
+        alert("Please enter a valid email");
+        return;
+    }
     console.log("Password reset link sent to:", email);
     alert("If this email is registered, you'll receive a password reset link.");
     navigate("/login"); // Redirect back to login page
