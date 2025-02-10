@@ -166,34 +166,6 @@ func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//func (app *application) deletehandler(w http.ResponseWriter, r *http.Request) {
-//	sessionToken, err := app.CheckCookie(w, r)
-//	if err != nil {
-//		return // Exit early if error occurs
-//	}
-//
-//	_, err3 := app.CheckToken(w, sessionToken)
-//	if err3 != nil {
-//		return // Exit early if token is invalid
-//	}
-//	var input struct {
-//		Email    string `json:"email"`
-//		Password string `json:"password"`
-//	}
-//	dec := json.NewDecoder(r.Body)
-//	err := dec.Decode(&input)
-//	if err != nil {
-//		http.Error(w, err.Error(), http.StatusBadRequest)
-//		return
-//	}
-//	user, err := app.Models.UserModel.Query(input.Email)
-//	if err != nil {
-//		fmt.Println(err)
-//		return
-//	}
-//	user, err2 := app.Models.UserModel.Find()
-//}
-
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
