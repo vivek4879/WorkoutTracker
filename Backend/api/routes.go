@@ -93,6 +93,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := app.Models.UserModel.Query(input.Email)
 	if err != nil {
 		fmt.Println(err)
+		fmt.Println("User not registered, please Sign up and then login")
 		return
 	}
 	match, err := argon2id.ComparePasswordAndHash(input.Password, user.Password)
@@ -106,7 +107,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString()
 	expiresAt := time.Now().Add(48 * time.Hour)
 
-	err1 := app.Models.UserModel.INSERTSESSION(user.Userid, sessionToken, expiresAt)
+	err1 := app.Models.UserModel.InsertSession(user.ID, sessionToken, expiresAt)
 	if err1 != nil {
 		fmt.Println(err1)
 	}
@@ -148,7 +149,7 @@ func (app *application) CheckToken(w http.ResponseWriter, sessionToken string) (
 	return &s.Token, nil
 }
 
-func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	sessionToken, err := app.CheckCookie(w, r)
 	if err != nil {
 		return // Exit early if error occurs
@@ -166,12 +167,39 @@ func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	sessionToken, err := app.CheckCookie(w, r)
+	if err != nil {
+		return
+	}
+	session, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
+	if err2 != nil {
+		return
+	}
+	user, err3 := app.Models.UserModel.QueryUserId(session.UserID)
+	if err3 != nil {
+		fmt.Println(err3)
+		return
+	}
+	err4 := app.Models.UserModel.DeleteUser(*user)
+	if err4 != nil {
+		fmt.Println(err4)
+		return
+	}
+	err5 := app.Models.UserModel.DeleteSession(*session)
+	if err5 != nil {
+		fmt.Println(err5)
+		return
+	}
+	fmt.Println("User successfully deleted")
+}
+
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
 	router.HandlerFunc(http.MethodPost, "/login", app.loginHandler)
-	router.HandlerFunc(http.MethodGet, "/welcome", app.welcomeHandler)
+	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
-	//router.HandlerFunc(http.MethodDelete, "/deleteaccount", app.deletehandler)
+	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)
 	return router
 }

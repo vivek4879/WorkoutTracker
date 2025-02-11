@@ -30,7 +30,7 @@ type UserLogin struct {
 	Userid   uint
 }
 
-func (u MyModel) INSERTSESSION(Id uint, Token string, expiry time.Time) error {
+func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	session := Sessions{
 		UserID: Id,
 		Token:  Token,
@@ -67,19 +67,19 @@ func (u MyModel) Insert(FirstName string, LastName string, Email string, Passwor
 	return nil
 }
 
-func (u MyModel) Query(Email string) (*UserLogin, error) {
-	var user UserLogin
-	res := u.db.Table("users").Select("email,password,userid").Where("email = ?", Email).First(&user)
+func (u MyModel) Query(Email string) (*Users, error) {
+	var user Users
+	res := u.db.Table("users").Where("email = ?", Email).First(&user)
 
 	if res.Error != nil {
 		return nil, res.Error
 	}
 	return &user, nil
 }
-
-func (u MyModel) Find(Email string) (*Users, error) {
+func (u MyModel) QueryUserId(userID uint) (*Users, error) {
 	var user Users
-	res := u.db.Table("users").Where("email = ?", Email).First(&user)
+	res := u.db.Table("users").Where("userid = ?", userID).First(&user)
+
 	if res.Error != nil {
 		return nil, res.Error
 	}
