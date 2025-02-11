@@ -51,6 +51,7 @@ func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	//http.Error(w, "Unauthorized:Session expired", http.StatusUnauthorized)
 
 	fmt.Println("User successfully logged out")
+
 	return
 }
 
@@ -67,12 +68,14 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 	_, err1 := app.Models.UserModel.Query(input.Email)
 	if err1 == nil {
 		fmt.Printf("%s already exists\n", input.Email)
+		http.Error(w, "Email already exists", http.StatusBadRequest)
 		return
 	}
 
 	hashedPassword := hashing(input.Password)
 	err := app.Models.UserModel.Insert(input.FirstName, input.LastName, input.Email, hashedPassword)
 	fmt.Println("User created")
+
 	if err != nil {
 		fmt.Println("here")
 		fmt.Println(err)
@@ -93,6 +96,8 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := app.Models.UserModel.Query(input.Email)
 	if err != nil {
 		fmt.Println(err)
+		fmt.Println("User not registered, please Sign up and then login")
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 	match, err := argon2id.ComparePasswordAndHash(input.Password, user.Password)
@@ -106,7 +111,7 @@ func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
 	sessionToken := uuid.NewString()
 	expiresAt := time.Now().Add(48 * time.Hour)
 
-	err1 := app.Models.UserModel.INSERTSESSION(user.Userid, sessionToken, expiresAt)
+	err1 := app.Models.UserModel.InsertSession(user.ID, sessionToken, expiresAt)
 	if err1 != nil {
 		fmt.Println(err1)
 	}
@@ -148,7 +153,7 @@ func (app *application) CheckToken(w http.ResponseWriter, sessionToken string) (
 	return &s.Token, nil
 }
 
-func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	sessionToken, err := app.CheckCookie(w, r)
 	if err != nil {
 		return // Exit early if error occurs
@@ -166,12 +171,45 @@ func (app *application) welcomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	sessionToken, err := app.CheckCookie(w, r)
+	if err != nil {
+		http.Error(w, "Unauthorized: Session not found", http.StatusUnauthorized)
+		return
+	}
+	session, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
+	if err2 != nil {
+		fmt.Println(err2)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	user, err3 := app.Models.UserModel.QueryUserId(session.UserID)
+	if err3 != nil {
+		fmt.Println(err3)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	err4 := app.Models.UserModel.DeleteUser(*user)
+	if err4 != nil {
+		fmt.Println(err4)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	err5 := app.Models.UserModel.DeleteSession(*session)
+	if err5 != nil {
+		fmt.Println(err5)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("User successfully deleted")
+}
+
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
 	router.HandlerFunc(http.MethodPost, "/login", app.loginHandler)
-	router.HandlerFunc(http.MethodGet, "/welcome", app.welcomeHandler)
+	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
-	//router.HandlerFunc(http.MethodDelete, "/deleteaccount", app.deletehandler)
+	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)
 	return router
 }

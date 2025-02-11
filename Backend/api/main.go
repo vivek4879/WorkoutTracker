@@ -12,7 +12,7 @@ type application struct {
 
 func main() {
 	app := application{}
-	dsn := "postgres://postgres:@localhost/timepass?sslmode=disable"
+	dsn := "postgres://postgres:@localhost/workoutusers?sslmode=disable"
 	conn := Connect(dsn)
 	app.Models = internal.NewModels(conn)
 	fmt.Println("Connected to Database")
