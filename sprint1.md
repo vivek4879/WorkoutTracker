@@ -52,15 +52,13 @@
    - Secure API endpoints with *JWT-based authentication*.  
    - Implement error handling and response validation on the frontend.  
 
-8. *Unit & Integration Testing*  
-   - Write test cases for authentication flows using *Jest, React Testing Library (Frontend)* and *Go/Node.js testing frameworks (Backend)*.  
-   - Ensure API endpoints are covered with unit and integration tests.  
-
-9. *Swagger API Documentation*  
+8. *Swagger API Documentation*  
    - Integrate *Swagger (OpenAPI)* for API documentation.  
    - Enable automatic API contract generation for easy debugging and testing.  
    - Provide example request-response structures for better API usability.  
 
+9. *Profile Deletion*
+   - User should be able to delete profile.
 ---
 
 
@@ -83,13 +81,9 @@
 4. *Frontend Implementation*  
    - Developed *React-based frontend* for authentication.  
    - Implemented responsive UI components for a seamless user experience.  
-   - Used *React Router* for page navigation.  
-
-5. *Frontend & Backend Integration*  
-   - Established API communication between *frontend and backend* using *RESTful APIs*.  
-   - Implemented *JWT-based authentication* for securing API endpoints.  
-   - Error handling and response validation successfully integrated.  
-
+   - Used *React Router* for page navigation.
+5. *Profile Deletion*
+   - User is able to delete profile.
 ---
 
 ## ❌ Not Completed
@@ -98,15 +92,11 @@
    - Future plans to include *OTP-based login for enhanced security*.  
 
 2. *Forgot Password Functionality*  
-   - The password reset flow using *OTP or token-based authentication* was not fully implemented.  
+   - The password reset flow using *OTP or token-based authentication* was not fully implemented because I want to do it using kafka and had trouble implementing it.  
    - Future implementation will include *email-based password reset with expiration*.  
 
-3. *Unit & Integration Testing*  
-   - No test coverage was added for authentication workflows.  
-   - Future tasks include *Jest/React Testing Library (Frontend)* and *Go/Node.js testing frameworks (Backend)* for comprehensive coverage.  
-
-4. *Swagger API Documentation*  
-   - API documentation using *Swagger (OpenAPI)* was not integrated.  
+3. *Swagger API Documentation*  
+   - API documentation using *Swagger (OpenAPI)* was not integrated because I was having trouble understanding it.  
    - Future enhancements will include *automatic API contract generation and request-response documentation*.  
 
 ---
