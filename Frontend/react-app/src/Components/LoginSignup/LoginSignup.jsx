@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./LoginSignup.css";
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Login");
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    // Normally, you'd validate credentials before navigating
+    navigate("/dashboard");
+  };
+
   return (
     <div className="LoginSignup">
       <div className="total-box">
@@ -17,20 +24,19 @@ const LoginSignup = () => {
           <div></div>
         ) : (
           <>
-            {" "}
             <div className="input">
-              <input type="text" placeholder="First Name" required="true" />
+              <input type="text" placeholder="First Name" required />
             </div>
             <div className="input">
-              <input type="text" placeholder="Last Name" required="true" />
+              <input type="text" placeholder="Last Name" required />
             </div>
           </>
         )}
         <div className="input">
-          <input type="email" placeholder="Email" required="true" />
+          <input type="email" placeholder="Email" required />
         </div>
         <div className="input">
-          <input type="password" placeholder="Password" required="true" />
+          <input type="password" placeholder="Password" required />
         </div>
       </div>
       {action === "Login" ? (
@@ -42,24 +48,17 @@ const LoginSignup = () => {
       <div className="submit-container">
         <div
           className={
-            action === "Login" ? "submit-button gray" : "submit-button"
+            action === "Sign Up" ? "submit-button gray" : "submit-button"
           }
-          onClick={() => {
-            setAction("Sign Up");
-          }}
+          onClick={() => setAction("Sign Up")}
         >
           Sign Up
         </div>
-        <div
-          className={
-            action === "Sign Up" ? "submit-button gray" : "submit-button"
-          }
-          onClick={() => {
-            setAction("Login");
-          }}
-        >
-          Login
-        </div>
+        {action === "Login" && (
+          <div className="submit-button" onClick={handleLogin}>
+            Login
+          </div>
+        )}
       </div>
     </div>
   );
