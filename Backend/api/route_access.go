@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -34,62 +35,57 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("session_token")
+	//retrieve session token from cookie
+	sess, err := app.Session(w, r)
 	if err != nil {
-		if err == http.ErrNoCookie {
-			http.Error(w, "No session token cookie", http.StatusUnauthorized)
-			return
-		}
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		app.sendErrorResponse(w, http.StatusUnauthorized, err.Error())
+		log.Printf("logout failed:%v", err)
 		return
 	}
-	sessionToken := c.Value
-	s, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
-	if err2 != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-	err3 := app.Models.UserModel.DeleteSession(*s)
+	//Delete session
+	err3 := app.Models.UserModel.DeleteSession(sess)
 	if err3 != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to delete session")
+		log.Printf("logout failed:Error deleting session%v", err3)
 		return
 	}
-	//http.Error(w, "Unauthorized:Session expired", http.StatusUnauthorized)
 
-	fmt.Println("User successfully logged out")
-
-	return
+	log.Printf("logout success")
+	app.sendSuccessResponse(w, http.StatusOK, map[string]string{"message": "User successfully logged out"})
 }
 
 func (app *application) deleteHandler(w http.ResponseWriter, r *http.Request) {
-	sessionToken, err := app.CheckCookie(w, r)
+	sess, err := app.Session(w, r)
 	if err != nil {
-		http.Error(w, "Unauthorized: Session not found", http.StatusUnauthorized)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
+		log.Printf("Error getting session: %v", err)
 		return
 	}
-	session, err2 := app.Models.UserModel.QUERYSESSION(sessionToken)
-	if err2 != nil {
-		fmt.Println(err2)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	user, err3 := app.Models.UserModel.QueryUserId(session.UserID)
+
+	user, err3 := app.Models.UserModel.QueryUserId(sess.UserID)
 	if err3 != nil {
-		fmt.Println(err3)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Failed to retrieve user")
+		log.Printf("Error getting user: %v", err3)
+
 		return
 	}
 	err4 := app.Models.UserModel.DeleteUser(*user)
 	if err4 != nil {
-		fmt.Println(err4)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Failed to delete user")
+		log.Printf("Error deleting user: %v", err4)
 		return
 	}
-	err5 := app.Models.UserModel.DeleteSession(*session)
+	err5 := app.Models.UserModel.DeleteSession(sess)
 	if err5 != nil {
-		fmt.Println(err5)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Failed to delete session")
+		log.Printf("Error deleting session: %v", err5)
 		return
 	}
-	fmt.Println("User successfully deleted")
+	log.Println("User successfully deleted")
+	//create a json response object, we will convert this map to json before sending to client
+	response := map[string]string{
+		"message": "User successfully deleted",
+	}
+	app.sendSuccessResponse(w, http.StatusOK, response)
+
 }

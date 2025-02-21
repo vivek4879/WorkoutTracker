@@ -2,6 +2,7 @@ package main
 
 import (
 	"WorkoutTracker/internal/database"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/alexedwards/argon2id"
@@ -39,4 +40,19 @@ func (app *application) Session(w http.ResponseWriter, r *http.Request) (sess da
 		return database.Sessions{}, errors.New("Invalid or expired Session")
 	}
 	return *s, nil
+}
+
+// helper function for JSON error responses
+// tells the client(browser,frontend,API consumer) that the response is in JSON
+// without this the client might assume its plain text
+func (app *application) sendErrorResponse(w http.ResponseWriter, status int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+func (app *application) sendSuccessResponse(w http.ResponseWriter, status int, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(payload)
 }
