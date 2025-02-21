@@ -3,6 +3,7 @@ package main
 import (
 	internal "WorkoutTracker/internal/database"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
@@ -23,4 +24,14 @@ func main() {
 	}
 	fmt.Printf("Listening on port %s\n", srv.Addr)
 	_ = srv.ListenAndServe()
+}
+
+func (app *application) routes() http.Handler {
+	router := httprouter.New()
+	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
+	router.HandlerFunc(http.MethodPost, "/login", app.loginHandler)
+	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
+	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
+	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)
+	return router
 }
