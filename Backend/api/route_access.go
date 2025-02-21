@@ -3,11 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/alexedwards/argon2id"
-	"github.com/google/uuid"
-	"log"
 	"net/http"
-	"time"
 )
 
 func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,47 +31,6 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("here")
 		fmt.Println(err)
 	}
-}
-
-func (app *application) loginHandler(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	dec := json.NewDecoder(r.Body)
-	err := dec.Decode(&input)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	user, err := app.Models.UserModel.Query(input.Email)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("User not registered, please Sign up and then login")
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-	match, err := argon2id.ComparePasswordAndHash(input.Password, user.Password)
-	if err != nil {
-		log.Printf("Incorrect Password for user: %s ", user.Email)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	log.Printf("User %s matches %t ", user.Email, match)
-	//Create new random session token
-	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(48 * time.Hour)
-
-	err1 := app.Models.UserModel.InsertSession(user.ID, sessionToken, expiresAt)
-	if err1 != nil {
-		fmt.Println(err1)
-	}
-	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   sessionToken,
-		Expires: expiresAt,
-	})
-
 }
 
 func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
