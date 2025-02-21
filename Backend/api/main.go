@@ -29,7 +29,7 @@ func main() {
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
-	router.HandlerFunc(http.MethodPost, "/login", app.AuthenticationHandler)
+	router.HandlerFunc(http.MethodPost, "/Authenticate", app.AuthenticationHandler)
 	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
 	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)

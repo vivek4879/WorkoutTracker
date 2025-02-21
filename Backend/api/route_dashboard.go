@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -21,7 +20,7 @@ func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request)
 	response := map[string]string{
 		"message": "Welcome to the dashboard page",
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	log.Printf("Response from Dashboard: %s", response)
+	app.sendSuccessResponse(w, http.StatusOK, response)
+
 }

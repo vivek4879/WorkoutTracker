@@ -20,18 +20,23 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 	_, err1 := app.Models.UserModel.Query(input.Email)
 	if err1 == nil {
 		fmt.Printf("%s already exists\n", input.Email)
-		http.Error(w, "Email already exists", http.StatusBadRequest)
+		app.sendErrorResponse(w, http.StatusConflict, "Email already exists")
 		return
 	}
 
 	hashedPassword := hashing(input.Password)
 	err := app.Models.UserModel.Insert(input.FirstName, input.LastName, input.Email, hashedPassword)
-	fmt.Println("User created")
+	fmt.Printf("User %s created", input.Email)
 
 	if err != nil {
-		fmt.Println("here")
-		fmt.Println(err)
+		fmt.Printf("User %s not created", input.Email)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
 	}
+	response := map[string]string{
+		"message": "User successfully created",
+	}
+
+	app.sendSuccessResponse(w, http.StatusOK, response)
 }
 
 func (app *application) logoutHandler(w http.ResponseWriter, r *http.Request) {
