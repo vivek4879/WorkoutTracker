@@ -1,24 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"net/http"
 )
 
 func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	sessionToken, err := app.CheckCookie(w, r)
+	//Validate Session
+	sess, err := app.Session(w, r)
 	if err != nil {
-		return // Exit early if error occurs
+		log.Printf("Error getting session: %v", err)
+		http.Error(w, `{"error":"Unauthorized: Invalid session"}`, http.StatusUnauthorized)
+		return
 	}
+	//Log Successful access
+	log.Printf("User %s accessed the Dashboard", sess.UserID)
 
-	_, err3 := app.CheckToken(w, sessionToken)
-	if err3 != nil {
-		return // Exit early if token is invalid
+	// Return JSON response
+	response := map[string]string{
+		"message": "Welcome to the dashboard page",
 	}
-
-	fmt.Println("Welcome to the home page")
-	_, writeErr := w.Write([]byte("Welcome to the home page!\n"))
-	if writeErr != nil {
-		fmt.Println("Error writing response:", writeErr)
-	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
