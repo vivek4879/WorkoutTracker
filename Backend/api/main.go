@@ -22,7 +22,7 @@ func main() {
 	app.Models = internal.NewModels(conn)
 	fmt.Println("Connected to Database")
 
-	err := conn.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{})
+	err := conn.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Workouts{}, &internal.Exercises{})
 	if err != nil {
 		log.Fatal("Error in AutoMigrate:", err)
 	}
