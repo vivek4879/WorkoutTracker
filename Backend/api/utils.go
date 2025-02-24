@@ -35,7 +35,7 @@ func (app *application) Session(w http.ResponseWriter, r *http.Request) (sess da
 		}
 		return database.Sessions{}, fmt.Errorf("Error getting session token: %w", err)
 	}
-	s, err := app.Models.UserModel.QUERYSESSION(cookie.Value)
+	s, err := app.Models.UserModel.QuerySession(cookie.Value)
 	if err != nil {
 		return database.Sessions{}, errors.New("Invalid or expired Session")
 	}
