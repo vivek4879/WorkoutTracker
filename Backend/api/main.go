@@ -4,6 +4,7 @@ import (
 	internal "WorkoutTracker/internal/database"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
 )
 
@@ -13,10 +14,19 @@ type application struct {
 
 func main() {
 	app := application{}
-	dsn := "postgres://postgres:@localhost/workoutusers?sslmode=disable"
+	dsn := "postgres://vivekaher:@localhost/workoutusers?sslmode=disable"
 	conn := Connect(dsn)
+	if conn == nil {
+		log.Fatal("Failed to connect to database")
+	}
 	app.Models = internal.NewModels(conn)
 	fmt.Println("Connected to Database")
+
+	err := conn.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{})
+	if err != nil {
+		log.Fatal("Error in AutoMigrate:", err)
+	}
+	fmt.Println("AutoMigrate complete")
 
 	srv := http.Server{
 		Addr:    ":4000",

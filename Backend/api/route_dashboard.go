@@ -10,7 +10,7 @@ func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request)
 	sess, err := app.Session(w, r)
 	if err != nil {
 		log.Printf("Error getting session: %v", err)
-		http.Error(w, `{"error":"Unauthorized: Invalid session"}`, http.StatusUnauthorized)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
 		return
 	}
 	//Log Successful access
@@ -22,5 +22,17 @@ func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request)
 	}
 	log.Printf("Response from Dashboard: %s", response)
 	app.sendSuccessResponse(w, http.StatusOK, response)
+
+}
+
+func (app *application) AddExerciseHandler(w http.ResponseWriter, r *http.Request) {
+	//Validate Session
+	sess, err := app.Session(w, r)
+	if err != nil {
+		log.Printf("Error getting session: %v", err)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
+		return
+	}
+	log.Printf("User %s added exercise", sess.UserID)
 
 }
