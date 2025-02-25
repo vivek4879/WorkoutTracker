@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"github.com/lib/pq"
 	"time"
 )
 
@@ -16,6 +17,52 @@ func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	if res.Error != nil {
 		fmt.Println("Error inserting new session", res.Error)
 		return res.Error
+	}
+	return nil
+}
+func (u MyModel) QueryLastWorkoutId(UserID uint) (uint, error) {
+	var lastWorkoutId uint
+	res := u.db.Model(&Workouts{}).
+		Where("userid = ?", UserID).
+		Select("COALESCE(MAX(workoutid), 0) AS workoutid").Scan(&lastWorkoutId)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return lastWorkoutId, nil
+}
+func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) error {
+
+	lastWorkoutId, err := u.QueryLastWorkoutId(UserID)
+	lastWorkoutId += 1
+	if err != nil {
+		return err
+	}
+
+	var workoutBatch []Workouts
+
+	for _, exercise := range workouts {
+		var setNos, repetitions, weights []int64
+
+		//convert sets to arrays
+		for _, set := range exercise.Sets {
+			setNos = append(setNos, int64(set.SetNo))
+			repetitions = append(repetitions, int64(set.Repetitions))
+			weights = append(weights, int64(set.Weight))
+		}
+
+		workout := Workouts{
+			WorkoutId:         lastWorkoutId,
+			UserId:            UserID,
+			CurrentExerciseId: exercise.ExerciseId,
+			SetNo:             pq.Int64Array(setNos),
+			Repetitions:       pq.Int64Array(repetitions),
+			Weights:           pq.Int64Array(weights),
+			CreatedAt:         exercise.CreatedAt,
+		}
+		workoutBatch = append(workoutBatch, workout)
+	}
+	if err := u.db.Create(&workoutBatch).Error; err != nil {
+		return err
 	}
 	return nil
 }

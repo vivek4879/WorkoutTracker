@@ -1,11 +1,12 @@
 package main
 
 import (
-	"WorkoutTracker/internal/database"
+	internal "WorkoutTracker/internal/database"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/alexedwards/argon2id"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"runtime"
@@ -26,18 +27,18 @@ func hashing(password string) string {
 	return hash
 }
 
-func (app *application) Session(w http.ResponseWriter, r *http.Request) (sess database.Sessions, err error) {
+func (app *application) Session(w http.ResponseWriter, r *http.Request) (sess internal.Sessions, err error) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		// errors.Is() checks if error matches a specific type even if its wrapped inside another error
 		if errors.Is(err, http.ErrNoCookie) {
-			return database.Sessions{}, errors.New("No session token cookie")
+			return internal.Sessions{}, errors.New("No session token cookie")
 		}
-		return database.Sessions{}, fmt.Errorf("Error getting session token: %w", err)
+		return internal.Sessions{}, fmt.Errorf("Error getting session token: %w", err)
 	}
 	s, err := app.Models.UserModel.QuerySession(cookie.Value)
 	if err != nil {
-		return database.Sessions{}, errors.New("Invalid or expired Session")
+		return internal.Sessions{}, errors.New("Invalid or expired Session")
 	}
 	return *s, nil
 }
@@ -55,4 +56,14 @@ func (app *application) sendSuccessResponse(w http.ResponseWriter, status int, p
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(payload)
+}
+
+func MigrateDB(db *gorm.DB) {
+	//creating table using automigrate
+	err := db.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Workouts{}, &internal.Exercises{})
+	if err != nil {
+		log.Fatal("Migration error:", err)
+	}
+	log.Println("Database migrated")
+
 }

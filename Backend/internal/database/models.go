@@ -38,11 +38,17 @@ type UserLogin struct {
 	Userid   uint
 }
 
+type WorkoutToUser struct {
+	UserID         uint     `gorm:"column:userid;"`
+	WorkoutEntryID uint     `gorm:"column:workoutid;primaryKey;"`
+	Workout        Workouts `gorm:"foreignKey:WorkoutEntryID;references:WorkoutEntryID;constraint:OnDelete:CASCADE"`
+}
 type Workouts struct {
-	WorkoutId         uint          `gorm:"column:workoutid;primaryKey;autoIncrement"`
+	WorkoutEntryID    uint          `gorm:"column:workout_entry_id;primaryKey;autoIncrement"`
+	WorkoutId         uint          `gorm:"column:workoutid"`
 	UserId            uint          `gorm:"column:userid"`
 	CurrentExerciseId uint          `gorm:"column:exerciseid"`
-	SetNo             uint          `gorm:"column:setno"`
+	SetNo             pq.Int64Array `gorm:"column:setno;type:integer[]"`
 	Repetitions       pq.Int64Array `gorm:"column:repetitions;type:integer[]"`
 	Weights           pq.Int64Array `gorm:"column:weights;type:integer[]"`
 	CreatedAt         time.Time     `gorm:"column:created_at"`
@@ -50,7 +56,31 @@ type Workouts struct {
 	Exercise          Exercises     `gorm:"foreignKey:CurrentExerciseId;references:ExerciseId;constraint:OnDelete:CASCADE"`
 }
 
+//func (Workouts) TableName() string {
+//	return "workouts"
+//}
+
 type Exercises struct {
 	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
 	ExerciseName string `gorm:"column:exercisename"`
+}
+
+// struct to capture frontend data
+type WorkoutSet struct {
+	SetNo       uint  `json:"setno"`
+	Repetitions int64 `json:"repetitions"`
+	Weight      int64 `json:"weights"`
+}
+
+// struct to capture frontend data
+type WorkoutInput struct {
+	UserId   uint           `json:"userid"`
+	Workouts []ExerciseData `json:"workouts"`
+}
+
+// struct to capture frontend data
+type ExerciseData struct {
+	ExerciseId uint         `json:"exerciseid"`
+	Sets       []WorkoutSet `json:"sets"`
+	CreatedAt  time.Time    `json:"created_at"`
 }
