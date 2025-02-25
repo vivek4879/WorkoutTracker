@@ -1,6 +1,8 @@
 package main
 
 import (
+	"WorkoutTracker/internal/database"
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -25,7 +27,7 @@ func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (app *application) AddExerciseHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 	//Validate Session
 	sess, err := app.Session(w, r)
 	if err != nil {
@@ -34,5 +36,31 @@ func (app *application) AddExerciseHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	log.Printf("User %U added exercise\n", sess.UserID)
+
+	//decode workout data from request body
+	var input struct {
+		Workouts []database.ExerciseData `json:"workouts"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		app.sendErrorResponse(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+	// insert workout with validated userid and get workout_entry_ids
+
+	workoutEntryIDs, err := app.Models.UserModel.InsertWorkout(sess.UserID, input.Workouts)
+	if err != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	//insert into workoutToUser Table
+	err1 := app.Models.UserModel.InsertWorkoutToUser(sess.UserID, workoutEntryIDs)
+	if err1 != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	app.sendSuccessResponse(w, http.StatusCreated, "Workout added successfully")
 
 }

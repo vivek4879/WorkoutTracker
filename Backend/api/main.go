@@ -22,11 +22,7 @@ func main() {
 	app.Models = internal.NewModels(conn)
 	fmt.Println("Connected to Database")
 
-	err := conn.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{})
-	if err != nil {
-		log.Fatal("Error in AutoMigrate:", err)
-	}
-	fmt.Println("AutoMigrate complete")
+	MigrateDB(conn)
 
 	srv := http.Server{
 		Addr:    ":4000",
@@ -43,5 +39,6 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
 	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)
+	router.HandlerFunc(http.MethodPost, "/addWorkout", app.AddWorkoutHandler)
 	return router
 }
