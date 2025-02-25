@@ -30,12 +30,12 @@ func (u MyModel) QueryLastWorkoutId(UserID uint) (uint, error) {
 	}
 	return lastWorkoutId, nil
 }
-func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) error {
+func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, error) {
 
 	lastWorkoutId, err := u.QueryLastWorkoutId(UserID)
 	lastWorkoutId += 1
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var workoutBatch []Workouts
@@ -62,6 +62,27 @@ func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) error {
 		workoutBatch = append(workoutBatch, workout)
 	}
 	if err := u.db.Create(&workoutBatch).Error; err != nil {
+		return nil, err
+	}
+	//retrieve inserted workout_entry_id's
+	var insertWorkoutIDs []uint
+	for _, workout := range workoutBatch {
+		insertWorkoutIDs = append(insertWorkoutIDs, workout.WorkoutEntryID)
+	}
+	return insertWorkoutIDs, nil
+}
+
+func (u MyModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error {
+	var workoutUserBatch []WorkoutToUser
+
+	for _, workoutEntryID := range workoutEntryIDs {
+		workoutUser := WorkoutToUser{
+			UserID:                  userID,
+			WorkoutEntryIDSecondary: workoutEntryID,
+		}
+		workoutUserBatch = append(workoutUserBatch, workoutUser)
+	}
+	if err := u.db.Create(&workoutUserBatch).Error; err != nil {
 		return err
 	}
 	return nil

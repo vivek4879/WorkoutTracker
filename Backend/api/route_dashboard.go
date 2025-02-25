@@ -46,13 +46,21 @@ func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request
 		app.sendErrorResponse(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
-	// insert workout with validated userid
+	// insert workout with validated userid and get workout_entry_ids
 
-	err = app.Models.UserModel.InsertWorkout(sess.UserID, input.Workouts)
+	workoutEntryIDs, err := app.Models.UserModel.InsertWorkout(sess.UserID, input.Workouts)
 	if err != nil {
 		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
+
+	//insert into workoutToUser Table
+	err1 := app.Models.UserModel.InsertWorkoutToUser(sess.UserID, workoutEntryIDs)
+	if err1 != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
 	app.sendSuccessResponse(w, http.StatusCreated, "Workout added successfully")
 
 }

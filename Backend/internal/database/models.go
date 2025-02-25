@@ -39,9 +39,9 @@ type UserLogin struct {
 }
 
 type WorkoutToUser struct {
-	UserID         uint     `gorm:"column:userid;"`
-	WorkoutEntryID uint     `gorm:"column:workoutid;primaryKey;"`
-	Workout        Workouts `gorm:"foreignKey:WorkoutEntryID;references:WorkoutEntryID;constraint:OnDelete:CASCADE"`
+	UserID                  uint     `gorm:"column:userid;primaryKey"`
+	WorkoutEntryIDSecondary uint     `gorm:"column:workout_entry_id_Secondary;primaryKey;"`
+	Workout                 Workouts `gorm:"foreignKey:WorkoutEntryIDSecondary;references:WorkoutEntryID;constraint:OnDelete:CASCADE"`
 }
 type Workouts struct {
 	WorkoutEntryID    uint          `gorm:"column:workout_entry_id;primaryKey;autoIncrement"`
