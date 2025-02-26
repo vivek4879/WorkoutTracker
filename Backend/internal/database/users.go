@@ -2,35 +2,11 @@ package database
 
 import (
 	"fmt"
-	"gorm.io/gorm"
+	"github.com/lib/pq"
 	"time"
 )
 
-type MyModel struct {
-	db *gorm.DB
-}
-type Sessions struct {
-	UserID uint      `gorm:"column:userid;primaryKey;not null"`
-	Token  string    `gorm:"unique;not null"`
-	Expiry time.Time `gorm:"not null"`
-	User   Users     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-}
-
-type Users struct {
-	ID        uint   `gorm:"column:userid;primaryKey;autoIncrement"` // Use `ID` (uppercase) for GORM
-	FirstName string `gorm:"column:firstname;not null"`
-	LastName  string `gorm:"column:lastname;not null"`
-	Email     string `gorm:"column:email;unique;not null"`
-	Password  string `gorm:"column:password; not null"`
-}
-
-type UserLogin struct {
-	Email    string
-	Password string
-	Userid   uint
-}
-
-func (u MyModel) INSERTSESSION(Id uint, Token string, expiry time.Time) error {
+func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	session := Sessions{
 		UserID: Id,
 		Token:  Token,
@@ -44,7 +20,74 @@ func (u MyModel) INSERTSESSION(Id uint, Token string, expiry time.Time) error {
 	}
 	return nil
 }
-func (u MyModel) QUERYSESSION(SessionToken string) (*Sessions, error) {
+func (u MyModel) QueryLastWorkoutId(UserID uint) (uint, error) {
+	var lastWorkoutId uint
+	res := u.db.Model(&Workouts{}).
+		Where("userid = ?", UserID).
+		Select("COALESCE(MAX(workoutid), 0) AS workoutid").Scan(&lastWorkoutId)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return lastWorkoutId, nil
+}
+func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, error) {
+
+	lastWorkoutId, err := u.QueryLastWorkoutId(UserID)
+	lastWorkoutId += 1
+	if err != nil {
+		return nil, err
+	}
+
+	var workoutBatch []Workouts
+
+	for _, exercise := range workouts {
+		var setNos, repetitions, weights []int64
+
+		//convert sets to arrays
+		for _, set := range exercise.Sets {
+			setNos = append(setNos, int64(set.SetNo))
+			repetitions = append(repetitions, int64(set.Repetitions))
+			weights = append(weights, int64(set.Weight))
+		}
+
+		workout := Workouts{
+			WorkoutId:         lastWorkoutId,
+			UserId:            UserID,
+			CurrentExerciseId: exercise.ExerciseId,
+			SetNo:             pq.Int64Array(setNos),
+			Repetitions:       pq.Int64Array(repetitions),
+			Weights:           pq.Int64Array(weights),
+			CreatedAt:         exercise.CreatedAt,
+		}
+		workoutBatch = append(workoutBatch, workout)
+	}
+	if err := u.db.Create(&workoutBatch).Error; err != nil {
+		return nil, err
+	}
+	//retrieve inserted workout_entry_id's
+	var insertWorkoutIDs []uint
+	for _, workout := range workoutBatch {
+		insertWorkoutIDs = append(insertWorkoutIDs, workout.WorkoutEntryID)
+	}
+	return insertWorkoutIDs, nil
+}
+
+func (u MyModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error {
+	var workoutUserBatch []WorkoutToUser
+
+	for _, workoutEntryID := range workoutEntryIDs {
+		workoutUser := WorkoutToUser{
+			UserID:                  userID,
+			WorkoutEntryIDSecondary: workoutEntryID,
+		}
+		workoutUserBatch = append(workoutUserBatch, workoutUser)
+	}
+	if err := u.db.Create(&workoutUserBatch).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func (u MyModel) QuerySession(SessionToken string) (*Sessions, error) {
 	var session Sessions
 	res := u.db.Table("sessions").Where("Token = ?", SessionToken).First(&session)
 	if res.Error != nil {
@@ -67,19 +110,19 @@ func (u MyModel) Insert(FirstName string, LastName string, Email string, Passwor
 	return nil
 }
 
-func (u MyModel) Query(Email string) (*UserLogin, error) {
-	var user UserLogin
-	res := u.db.Table("users").Select("email,password,userid").Where("email = ?", Email).First(&user)
+func (u MyModel) Query(Email string) (*Users, error) {
+	var user Users
+	res := u.db.Table("users").Where("email = ?", Email).First(&user)
 
 	if res.Error != nil {
 		return nil, res.Error
 	}
 	return &user, nil
 }
-
-func (u MyModel) Find(Email string) (*Users, error) {
+func (u MyModel) QueryUserId(userID uint) (*Users, error) {
 	var user Users
-	res := u.db.Table("users").Where("email = ?", Email).First(&user)
+	res := u.db.Table("users").Where("userid = ?", userID).First(&user)
+
 	if res.Error != nil {
 		return nil, res.Error
 	}
