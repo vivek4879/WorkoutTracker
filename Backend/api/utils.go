@@ -12,7 +12,7 @@ import (
 	"runtime"
 )
 
-func hashing(password string) string {
+func Hashing(password string) string {
 	params := &argon2id.Params{
 		Memory:      128 * 1024,
 		Iterations:  4,

@@ -24,7 +24,7 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hashedPassword := hashing(input.Password)
+	hashedPassword := Hashing(input.Password)
 	err := app.Models.UserModel.Insert(input.FirstName, input.LastName, input.Email, hashedPassword)
 	fmt.Printf("User %s created", input.Email)
 

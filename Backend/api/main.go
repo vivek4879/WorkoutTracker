@@ -19,7 +19,9 @@ func main() {
 	if conn == nil {
 		log.Fatal("Failed to connect to database")
 	}
-	app.Models = internal.NewModels(conn)
+	app.Models = internal.Models{
+		UserModel: internal.NewMyModel(conn),
+	}
 	fmt.Println("Connected to Database")
 
 	MigrateDB(conn)
