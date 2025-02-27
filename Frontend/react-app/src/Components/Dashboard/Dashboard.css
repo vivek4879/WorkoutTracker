@@ -1,0 +1,8 @@
+.container {
+  display: flex;
+}
+.navbar {
+  background-color: #ffeb00;
+  width: 100px;
+  height: 100px;
+}
