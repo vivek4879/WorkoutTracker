@@ -26,9 +26,7 @@ func main() {
 		},
 		PasswordHasher: Argon2Hasher{}, // Ensure this is not nil
 	}
-	//app.Models = internal.Models{
-	//	UserModel: internal.NewMyModel(conn),
-	//}
+
 	fmt.Println("Connected to Database")
 
 	MigrateDB(conn)

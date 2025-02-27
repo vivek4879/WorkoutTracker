@@ -1,11 +1,12 @@
 package main
 
 import (
-	internal "WorkoutTracker/internal/database"
+	"WorkoutTracker/internal/database"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"github.com/stretchr/testify/mock"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
@@ -17,17 +18,9 @@ func TestSignupHandler(t *testing.T) {
 	mockUserModel.On("Query", "test@email.com").Return(nil, errors.New("user not found")) // Simulate "User Not Found"
 	//Expect insert to be called with these parameters and return nil if successful
 	mockUserModel.On("Insert", "Vivek", "Aher", "test@email.com", mock.Anything).Return(nil)
-	// Mocking other methods that might be used
-	//mockUserModel.On("InsertSession", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	//mockUserModel.On("QuerySession", mock.Anything).Return(nil, nil)
-	//mockUserModel.On("DeleteSession", mock.Anything).Return(nil)
-	//mockUserModel.On("QueryUserId", mock.Anything).Return(nil, nil)
-	//mockUserModel.On("DeleteUser", mock.Anything).Return(nil)
-	//mockUserModel.On("InsertWorkout", mock.Anything, mock.Anything).Return([]uint{1, 2}, nil)
-	//mockUserModel.On("InsertWorkoutToUser", mock.Anything, mock.Anything).Return(nil)
 
 	// Create an instance of internal.Models, replacing userModel with mock
-	mockModels := internal.Models{
+	mockModels := database.Models{
 		UserModel: mockUserModel, // inject mock user model
 	}
 	app := application{Models: mockModels} // Inject mock model into app
@@ -64,6 +57,19 @@ func TestSignupHandler(t *testing.T) {
 
 	mockUserModel.AssertExpectations(t)
 
+}
+
+// Mock session struct
+// Instead of modifying application, we create a mock version inside our test.
+// This overrides Session() only for the test, without causing conflicts
+// It uses a function MockSession that we can set dynamically in the test
+type MockApplication struct {
+	application
+	MockSession func(w http.ResponseWriter, r *http.Request) (*database.Sessions, error)
+}
+
+func (m *MockApplication) Session(w http.ResponseWriter, r *http.Request) (*database.Sessions, error) {
+	return m.MockSession(w, r)
 }
 
 //func TestSignupHandler(t *testing.T) {
