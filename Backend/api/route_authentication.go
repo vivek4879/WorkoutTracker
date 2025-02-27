@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/alexedwards/argon2id"
 	"github.com/google/uuid"
 	"log"
 	"net/http"
@@ -28,7 +27,8 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 		log.Printf("User not found: %s", input.Email)
 		return
 	}
-	match, err := argon2id.ComparePasswordAndHash(input.Password, user.Password)
+
+	match, err := app.PasswordHasher.Compare(input.Password, user.Password)
 	if err != nil {
 		app.sendErrorResponse(w, http.StatusUnauthorized, "error\": \"Invalid email or password")
 		log.Printf("Incorrect Password for user: %s ", user.Email)

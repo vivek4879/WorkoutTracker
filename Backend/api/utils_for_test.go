@@ -41,6 +41,42 @@ func (m *MockUserModel) QuerySession(SessionToken string) (*database.Sessions, e
 	return args.Get(0).(*database.Sessions), args.Error(1)
 }
 
+// Mock DeleteSession function
+func (m *MockUserModel) DeleteSession(s database.Sessions) error {
+	args := m.Called(s)
+	return args.Error(0)
+}
+
+// Mock QueryUserId function
+func (m *MockUserModel) QueryUserId(userID uint) (*database.Users, error) {
+	args := m.Called(userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*database.Users), args.Error(1)
+}
+
+// Mock DeleteUser function
+func (m *MockUserModel) DeleteUser(u database.Users) error {
+	args := m.Called(u)
+	return args.Error(0)
+}
+
+// Mock InsertWorkout function
+func (m *MockUserModel) InsertWorkout(UserID uint, workouts []database.ExerciseData) ([]uint, error) {
+	args := m.Called(UserID, workouts)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]uint), args.Error(1)
+}
+
+// Mock InsertWorkoutToUser function
+func (m *MockUserModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error {
+	args := m.Called(userID, workoutEntryIDs)
+	return args.Error(0)
+}
+
 //func setupTestDB() *gorm.DB {
 //	dsn := "host=localhost user=test password=test dbname=testdb port=5433 sslmode=disable"
 //	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

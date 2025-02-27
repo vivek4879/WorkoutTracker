@@ -12,6 +12,24 @@ import (
 	"runtime"
 )
 
+type PasswordHasher interface {
+	Compare(password, hash string) (bool, error)
+}
+
+type Argon2Hasher struct{}
+
+func (a Argon2Hasher) Compare(password, hash string) (bool, error) {
+	return argon2id.ComparePasswordAndHash(password, hash)
+}
+
+// DefaultPasswordHasher implements PasswordHasher using argon2id
+type DefaultPasswordHasher struct{}
+
+// ComparePasswordAndHash calls argon2id.ComparePasswordAndHash
+func (d DefaultPasswordHasher) ComparePasswordAndHash(password, hash string) (bool, error) {
+	return argon2id.ComparePasswordAndHash(password, hash)
+}
+
 func Hashing(password string) string {
 	params := &argon2id.Params{
 		Memory:      128 * 1024,

@@ -4,7 +4,8 @@ import (
 	internal "WorkoutTracker/internal/database"
 	"bytes"
 	"encoding/json"
-	"net/http"
+	"errors"
+	"github.com/stretchr/testify/mock"
 	"net/http/httptest"
 	"testing"
 )
@@ -12,8 +13,18 @@ import (
 func TestSignupHandler(t *testing.T) {
 	mockUserModel := new(MockUserModel) // create a mock user model
 
+	// Expect Query to be called before Insert
+	mockUserModel.On("Query", "test@email.com").Return(nil, errors.New("user not found")) // Simulate "User Not Found"
 	//Expect insert to be called with these parameters and return nil if successful
-	mockUserModel.On("Insert", "Vivek", "Aher", "Vivek@gmail.com", "securepassword").Return(nil)
+	mockUserModel.On("Insert", "Vivek", "Aher", "test@email.com", mock.Anything).Return(nil)
+	// Mocking other methods that might be used
+	//mockUserModel.On("InsertSession", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	//mockUserModel.On("QuerySession", mock.Anything).Return(nil, nil)
+	//mockUserModel.On("DeleteSession", mock.Anything).Return(nil)
+	//mockUserModel.On("QueryUserId", mock.Anything).Return(nil, nil)
+	//mockUserModel.On("DeleteUser", mock.Anything).Return(nil)
+	//mockUserModel.On("InsertWorkout", mock.Anything, mock.Anything).Return([]uint{1, 2}, nil)
+	//mockUserModel.On("InsertWorkoutToUser", mock.Anything, mock.Anything).Return(nil)
 
 	// Create an instance of internal.Models, replacing userModel with mock
 	mockModels := internal.Models{
@@ -40,8 +51,15 @@ func TestSignupHandler(t *testing.T) {
 	app.signupHandler(rec, req)
 
 	//check response
-	if rec.Code != http.StatusOK {
-		t.Errorf("Expected status 200, got %d", rec.Code)
+	var response map[string]string
+	err = json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	expectedMessage := "User successfully created"
+	if response["message"] != expectedMessage {
+		t.Errorf("Expected response message %q, got %q", expectedMessage, response["message"])
 	}
 
 	mockUserModel.AssertExpectations(t)
