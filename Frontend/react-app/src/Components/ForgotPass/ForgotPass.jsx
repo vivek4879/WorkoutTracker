@@ -8,9 +8,9 @@ const ForgotPass = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(email.length <= 0) {
-        alert("Please enter a valid email");
-        return;
+    if (email.length <= 0) {
+      alert("Please enter a valid email");
+      return;
     }
     console.log("Password reset link sent to:", email);
     alert("If this email is registered, you'll receive a password reset link.");
@@ -18,29 +18,31 @@ const ForgotPass = () => {
   };
 
   return (
-    <div className="LoginSignup">
-      <div className="total-box">
+    <div className="container">
+      <div className="Logo">
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
-      <div className="header">
-        <div className="text">Forgot Password</div>
-      </div>
-      <div className="inputs">
-        <div className="input">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+      <div className="ForgotPass">
+        <div className="header">
+          <h2 className="Page-Heading">Forgot Password?</h2>
         </div>
-      </div>
+        <div className="inputs">
+          <div className="input">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        </div>
 
-      <div className="submit-container">
-        <button className="submit-button" onClick={handleSubmit}>
-          Submit
-        </button>
+        <div className="submit-container">
+          <div className="submit-button" onClick={handleSubmit}>
+            Submit
+          </div>
+        </div>
       </div>
     </div>
   );

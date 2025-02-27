@@ -1,0 +1,11 @@
+* {
+  font-family: sans-serif;
+}
+.ForgotPass {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 320px;
+  min-height: 100vh;
+  padding-bottom: 10px;
+}

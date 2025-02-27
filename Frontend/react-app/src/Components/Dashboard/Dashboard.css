@@ -1,8 +1,28 @@
 .container {
   display: flex;
+  align-items: flex-start;
+  padding: 0px;
 }
-.navbar {
-  background-color: #ffeb00;
-  width: 100px;
-  height: 100px;
+
+.topnav {
+  background-color: #333;
+}
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #04aa6d;
+  color: white;
 }
