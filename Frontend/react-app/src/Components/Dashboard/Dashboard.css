@@ -6,8 +6,10 @@
   float: left;
   color: #000000;
   text-align: center;
-  padding: 14px 16px;
+  padding: 10px 16px;
   text-decoration: none;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 /* Change the color of links on hover */
@@ -21,39 +23,23 @@
   background-color: #323232;
   color: white;
 }
-.calContainer {
+.WorkoutContainer {
   display: flex;
-  justify-content: center;
-  margin-top: 30px;
-}
-.calendar {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  min-width: 280px;
-  min-height: 200px;
-  color: #000000;
-}
-.week {
-  display: flex;
-}
-.calBox {
-  /* border: 1px, solid black; */
-  min-width: 60px;
-  min-height: 34px;
-  font-size: 18px;
-  color: #000000;
-  margin: auto;
-  padding: auto;
-}
-.dayBox {
-  border: none;
-  font-size: 15px;
+  justify-content: space-evenly;
+  margin-top: -25px;
 }
 
-.calBox.active {
+.Workouts {
+  color: #000000;
+  font-weight: 300;
 }
 
-.calBox.today {
-  color: red;
+.WorkoutCard {
+  border: 2px solid #000000;
+  min-height: 270px;
+  min-width: 180px;
+  margin: 5px;
+  float: left;
+  display: flex;
+  justify-content: center;
 }
