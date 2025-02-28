@@ -6,10 +6,31 @@ import (
 	"time"
 )
 
-type Models struct {
-	UserModel MyModel
+// newInterface
+type UserModelInterface interface {
+	Insert(firstName, lastName, email, password string) error
+	Query(email string) (*Users, error)
+	InsertSession(Id uint, Token string, expiry time.Time) error
+	QuerySession(SessionToken string) (*Sessions, error)
+
+	DeleteSession(s Sessions) error
+	QueryUserId(userID uint) (*Users, error)
+	DeleteUser(u Users) error
+	InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, error)
+	InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error
 }
 
+// Ensure MyModel implements UserModelInterface
+var _ UserModelInterface = (*MyModel)(nil)
+
+// EndnewInterface
+type Models struct {
+	UserModel UserModelInterface
+}
+
+func NewMyModel(db *gorm.DB) UserModelInterface {
+	return &MyModel{db: db}
+}
 func NewModels(conn *gorm.DB) Models {
 	return Models{UserModel: MyModel{conn}}
 }

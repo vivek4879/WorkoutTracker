@@ -9,17 +9,24 @@ import (
 )
 
 type application struct {
-	Models internal.Models
+	Models         internal.Models
+	PasswordHasher PasswordHasher
 }
 
 func main() {
-	app := application{}
+
 	dsn := "postgres://vivekaher:@localhost/workoutusers?sslmode=disable"
 	conn := Connect(dsn)
 	if conn == nil {
 		log.Fatal("Failed to connect to database")
 	}
-	app.Models = internal.NewModels(conn)
+	app := application{
+		Models: internal.Models{
+			UserModel: internal.NewMyModel(conn), // Ensure this is not nil
+		},
+		PasswordHasher: Argon2Hasher{}, // Ensure this is not nil
+	}
+
 	fmt.Println("Connected to Database")
 
 	MigrateDB(conn)

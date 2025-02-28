@@ -1,0 +1,39 @@
+.calContainer {
+  display: flex;
+  justify-content: center;
+}
+.calendar {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  min-width: 280px;
+  min-height: 200px;
+  color: #000000;
+}
+.week {
+  display: flex;
+}
+.calBox {
+  min-width: 60px;
+  min-height: 34px;
+  font-size: 15px;
+  color: #000000;
+  text-align: center;
+}
+.dayBox {
+  font-size: 20px;
+}
+
+.calBox:hover {
+  background-color: #d8d8d8;
+}
+
+.calBox.today {
+  color: red;
+}
+
+.calBox.streak {
+  border: 2px solid rgb(72, 226, 116);
+  border-radius: 60%;
+  background-color: rgb(72, 226, 116);
+}
