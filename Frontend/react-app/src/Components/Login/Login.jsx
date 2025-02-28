@@ -11,12 +11,15 @@ const Login = () => {
   const handleSignUp = () => {
     navigate("/signup");
   };
-
+  const handleForgotPass = () => {
+    navigate("/forgot-password");
+  };
   return (
     <div className="container">
       <div className="Logo">
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
+
       <div className="Login">
         <div className="header">
           <h2 className="Page-Heading">Login</h2>
@@ -30,8 +33,10 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="forgot-password">
-          <Link to="/forgot-password">Forgot Password?</Link>
+        <div className="forgot-password" onClick={handleForgotPass}>
+          <div className="header">
+            <Link>Forgot Password?</Link>
+          </div>
         </div>
 
         <div className="submit-container">

@@ -1,28 +1,59 @@
-.container {
-  display: flex;
-  align-items: flex-start;
-  padding: 0px;
-}
-
 .topnav {
-  background-color: #333;
+  background-color: #ffeb00;
+  width: 100%;
 }
 .topnav a {
   float: left;
-  color: #f2f2f2;
+  color: #000000;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-  font-size: 17px;
 }
 
 /* Change the color of links on hover */
 .topnav a:hover {
-  background-color: #ddd;
+  background-color: #606060;
+  color: black;
 }
 
 /* Add a color to the active/current link */
 .topnav a.active {
-  background-color: #04aa6d;
+  background-color: #323232;
   color: white;
+}
+.calContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+.calendar {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  min-width: 280px;
+  min-height: 200px;
+  color: #000000;
+}
+.week {
+  display: flex;
+}
+.calBox {
+  /* border: 1px, solid black; */
+  min-width: 60px;
+  min-height: 34px;
+  font-size: 18px;
+  color: #000000;
+  margin: auto;
+  padding: auto;
+}
+.dayBox {
+  border: none;
+  font-size: 15px;
+}
+
+.calBox.active {
+}
+
+.calBox.today {
+  color: red;
 }
