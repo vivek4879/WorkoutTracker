@@ -96,3 +96,74 @@ func TestAuthenticationHandler(t *testing.T) {
 	mockUserModel.AssertExpectations(t)
 	mockHasher.AssertExpectations(t)
 }
+
+// TestAddWorkoutHandler tests adding a workout
+func TestAddWorkoutHandler(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Mock session
+	mockSession := &internal.Sessions{UserID: 1}
+
+	// Mock workouts input
+	workoutData := []internal.ExerciseData{
+		{ExerciseId: 101, Sets: []internal.WorkoutSet{{SetNo: 1, Repetitions: 10, Weight: 50}}},
+	}
+
+	// Mock workout entry IDs returned from InsertWorkout
+	mockWorkoutEntryIDs := []uint{201, 202}
+
+	// Mock QuerySession to return a valid session
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+
+	// Mock InsertWorkout to return workout IDs
+	mockUserModel.On("InsertWorkout", mockSession.UserID, workoutData).Return(mockWorkoutEntryIDs, nil)
+
+	// Mock InsertWorkoutToUser to succeed
+	mockUserModel.On("InsertWorkoutToUser", mockSession.UserID, mockWorkoutEntryIDs).Return(nil)
+
+	// Setup Application with Mock Model
+	mockModels := internal.Models{
+		UserModel: mockUserModel,
+	}
+	app := application{Models: mockModels}
+
+	// Create JSON request body
+	reqBody := map[string]interface{}{
+		"workouts": workoutData,
+	}
+	body, _ := json.Marshal(reqBody)
+
+	// Create HTTP request
+	req := httptest.NewRequest("POST", "/add-workout", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+
+	// Create Response Recorder
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	app.AddWorkoutHandler(rec, req)
+
+	// Assertions
+	if rec.Code != http.StatusCreated {
+		t.Errorf("Expected status 201, got %d", rec.Code)
+	}
+
+	type Response struct {
+		Message string `json:"message"`
+	}
+
+	var response Response
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse response JSON: %v\nResponse Body: %s", err, rec.Body.String())
+	}
+
+	expectedMessage := "Workout added successfully"
+	if response.Message != expectedMessage {
+		t.Errorf("Expected message %q, got %q", expectedMessage, response.Message)
+	}
+
+	// Ensure mock expectations were met
+	mockUserModel.AssertExpectations(t)
+}

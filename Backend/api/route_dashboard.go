@@ -61,6 +61,6 @@ func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	app.sendSuccessResponse(w, http.StatusCreated, "Workout added successfully")
-
+	response := map[string]string{"message": "Workout added successfully"}
+	app.sendSuccessResponse(w, http.StatusCreated, response)
 }
