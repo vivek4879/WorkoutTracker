@@ -1,9 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import { useState } from "react";
+
 const Login = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Normally, you'd validate credentials before navigating
     navigate("/dashboard");
   };
@@ -26,7 +31,13 @@ const Login = () => {
         </div>
         <div className="inputs">
           <div className="input">
-            <input type="email" placeholder="Email" required />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
           </div>
           <div className="input">
             <input type="password" placeholder="Password" required />
