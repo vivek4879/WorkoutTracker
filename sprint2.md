@@ -197,7 +197,7 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 }
 ```
 
-<b>Status Codes<b>:
+<b>Status Codes</b>:
 
 `201 Created` on success.
 
@@ -220,7 +220,7 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
   "message": "User successfully deleted"
 }
 ```
-<b>Status Codes<b>:
+<b>Status Codes</b>:
 
 `200 OK` on success.
 
