@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
@@ -70,6 +71,65 @@ type MockApplication struct {
 
 func (m *MockApplication) Session(w http.ResponseWriter, r *http.Request) (*database.Sessions, error) {
 	return m.MockSession(w, r)
+}
+
+func TestDeleteHandler(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Create a mock session
+	mockSession := &database.Sessions{
+		UserID: 1,
+		Token:  "mock-session-token",
+	}
+
+	// Create a mock user
+	mockUser := &database.Users{
+		ID:        1,
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "johndoe@example.com",
+		Password:  "hashedpassword",
+	}
+
+	// Mock session retrieval
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+
+	// Mock user retrieval
+	mockUserModel.On("QueryUserId", mockSession.UserID).Return(mockUser, nil)
+
+	// Mock user deletion
+	mockUserModel.On("DeleteUser", *mockUser).Return(nil)
+
+	// Mock session deletion
+	mockUserModel.On("DeleteSession", *mockSession).Return(nil)
+
+	// Setup application with mock model
+	mockModels := database.Models{
+		UserModel: mockUserModel,
+	}
+	app := application{Models: mockModels}
+
+	// Create HTTP request with session token
+	req := httptest.NewRequest("DELETE", "/delete", bytes.NewReader([]byte{}))
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: mockSession.Token})
+
+	// Create Response Recorder
+	rec := httptest.NewRecorder()
+
+	// Call the deleteHandler function
+	app.deleteHandler(rec, req)
+
+	// Assertions
+	assert.Equal(t, http.StatusOK, rec.Code, "Expected status 200 OK")
+
+	// Verify JSON Response
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err, "Failed to parse response JSON")
+	assert.Equal(t, "User successfully deleted", response["message"])
+
+	// Ensure mock expectations were met
+	mockUserModel.AssertExpectations(t)
 }
 
 //func TestSignupHandler(t *testing.T) {

@@ -105,3 +105,8 @@ type ExerciseData struct {
 	Sets       []WorkoutSet `json:"sets"`
 	CreatedAt  time.Time    `json:"created_at"`
 }
+
+type Exercise struct {
+	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
+	ExerciseName string `gorm:"column:exercisename;unique;not null"`
+}
