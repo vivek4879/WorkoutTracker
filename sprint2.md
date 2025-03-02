@@ -77,10 +77,10 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 <b>Request Body (JSON)</b>:
 ```
 {
-  "firstname": "John",
-  "lastname": "Doe",
-  "email": "johndoe@example.com",
-  "password": "securepassword"
+  "Firstname": "John",
+  "Lastname": "Doe",
+  "Email": "johndoe@example.com",
+  "Password": "securepassword"
 }
 ```
 <b>Response</b>:
@@ -101,8 +101,8 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 
 ```
 {
-  "email": "johndoe@example.com",
-  "password": "securepassword"
+  "Email": "johndoe@example.com",
+  "Password": "securepassword"
 }
 ```
 <b>Response</b>:

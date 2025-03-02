@@ -42,10 +42,10 @@ func main() {
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
-	router.HandlerFunc(http.MethodPost, "/Authenticate", app.AuthenticationHandler)
-	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
+	router.HandlerFunc(http.MethodPost, "/authenticate", app.AuthenticationHandler)
+	router.HandlerFunc(http.MethodGet, "/dashboard", app.DashboardHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
-	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)
-	router.HandlerFunc(http.MethodPost, "/addWorkout", app.AddWorkoutHandler)
+	router.HandlerFunc(http.MethodDelete, "/delete-account", app.deleteHandler)
+	router.HandlerFunc(http.MethodPost, "/add-workout", app.AddWorkoutHandler)
 	return router
 }
