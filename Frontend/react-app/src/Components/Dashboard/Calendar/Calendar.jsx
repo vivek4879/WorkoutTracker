@@ -52,106 +52,26 @@ function Calendar() {
           ))}
         </div>
         <div className="week">
-          <div className="calBox">
-            {22 - offset > 0 && (
-              <div>
-                <p>{22 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {23 - offset > 0 && (
-              <div>
-                <p>{23 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {24 - offset > 0 && (
-              <div>
-                <p>{24 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {25 - offset > 0 && (
-              <div>
-                <p>{25 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {26 - offset > 0 && (
-              <div>
-                <p>{26 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {27 - offset > 0 && (
-              <div>
-                <p>{27 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {28 - offset > 0 && (
-              <div>
-                <p>{28 - offset}</p>
-              </div>
-            )}
-          </div>
+          {week1.map((num) => (
+            <div className="calBox" key={num + 21}>
+              {num + 21 - offset > 0 && (
+                <div>
+                  <p>{num + 21 - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
         <div className="week">
-          <div className="calBox">
-            {29 - offset > 0 && (
-              <div>
-                <p>{29 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {30 - offset > 0 && (
-              <div>
-                <p>{30 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {31 - offset > 0 && (
-              <div>
-                <p>{31 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {32 - offset > 0 && (
-              <div>
-                <p>{32 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {33 - offset > 0 && (
-              <div>
-                <p>{33 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {34 - offset > 0 && (
-              <div>
-                <p>{34 - offset}</p>
-              </div>
-            )}
-          </div>
-          <div className="calBox">
-            {35 - offset > 0 && (
-              <div>
-                <p>{35 - offset}</p>
-              </div>
-            )}
-          </div>
+          {week1.map((num) => (
+            <div className="calBox" key={num + 28}>
+              {num + 28 - offset > 0 && (
+                <div>
+                  <p>{num + 28 - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
         <div className="week">
           <div className="calBox">
