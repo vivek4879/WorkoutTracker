@@ -2,6 +2,7 @@ package main
 
 import (
 	"WorkoutTracker/internal/database"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -58,4 +59,50 @@ func TestSession(t *testing.T) {
 		t.Errorf("Expected 'Invalid or expired Session' error, got %v", errInvalid)
 	}
 	mockUserModel.AssertExpectations(t)
+}
+
+func TestSendErrorResponse(t *testing.T) {
+	mockApp := &application{}
+
+	rec := httptest.NewRecorder()
+	mockApp.sendErrorResponse(rec, http.StatusForbidden, "Access Denied")
+
+	if rec.Code != http.StatusForbidden {
+		t.Errorf("Expected status 403, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse JSON response")
+	}
+
+	expectedError := "Access Denied"
+	if response["error"] != expectedError {
+		t.Errorf("Expected error message '%s', got '%s'", expectedError, response["error"])
+	}
+}
+
+func TestSendSuccessResponse(t *testing.T) {
+	mockApp := &application{}
+
+	rec := httptest.NewRecorder()
+	responseData := map[string]string{"message": "Operation successful"}
+
+	mockApp.sendSuccessResponse(rec, http.StatusOK, responseData)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse JSON response")
+	}
+
+	expectedMessage := "Operation successful"
+	if response["message"] != expectedMessage {
+		t.Errorf("Expected message '%s', got '%s'", expectedMessage, response["message"])
+	}
 }
