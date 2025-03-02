@@ -3,7 +3,7 @@
 ### 1. Backend
 In the Backend this sprint focused on implementing an interface for user management, developing workout related functionality, adding structured response handling, defining some new database tables and tests for the functions.
 
-1.1 Implementing the `UserModelInterface`
+**1.1 Implementing the `UserModelInterface`**
 
 One of the key improvements made in Sprint 2 was defining and implementing an interface (UserModelInterface) to enforce a standard structure for user-related operations in the database.This interface, located in models.go, defines essential functions for managing users, sessions, and workouts.
 With this interface in place, the MyModel struct was updated to implement all the required functions. This implementation ensures that any future changes to database operations can be integrated seamlessly.
@@ -13,22 +13,22 @@ With this interface in place, the MyModel struct was updated to implement all th
 * To enable mocking in unit tests, making the codebase more testable and maintainable.
 * To simplify future enhancements by allowing different database implementations to adhere to the same contract.
 
-1.2 Implementation of `AddWorkoutHandler`
+**1.2 Implementation of `AddWorkoutHandler`**
 
 Introduced the AddWorkoutHandler in route_access.go to allow authenticated users to add workouts.
 It Validates User Session before allowing modifications, parses JSON input to extract workout details,
 Inserts Data into `workouts` and `workout_to_user` tables, and return appropriate success/error messages.
 
-1.3 New Tables for Workouts & Exercises
+**1.3 New Tables for Workouts & Exercises**
 
 To support workouts, I introduced two new tables in models.go which store information about workouts associated with a user.
 
-1.4 Implementing Error and Success Response Functions
+**1.4 Implementing Error and Success Response Functions**
 
 To standardize API responses, we introduced sendErrorResponse and sendSuccessResponse functions in utils.go.
 The error response function handles API errors and returns JSON response. The success response function handles successful API responses.
 
-1.5 Unit Testing and Testify library 
+**1.5 Unit Testing and Testify library**
 
 I wrote unit tests using the Testify library to validate API behavior. The Testify library  provides mocking for database interactions, simplifies assertions with assert functions, and makes unit tests more readable and maintainable.
 
