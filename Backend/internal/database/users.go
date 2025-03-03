@@ -3,8 +3,24 @@ package database
 import (
 	"fmt"
 	"github.com/lib/pq"
+	"gorm.io/gorm/clause"
 	"time"
 )
+
+//func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
+//	session := Sessions{
+//		UserID: Id,
+//		Token:  Token,
+//		Expiry: expiry,
+//	}
+//
+//	res := u.db.Create(&session)
+//	if res.Error != nil {
+//		fmt.Println("Error inserting new session", res.Error)
+//		return res.Error
+//	}
+//	return nil
+//}
 
 func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	session := Sessions{
@@ -12,14 +28,21 @@ func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 		Token:  Token,
 		Expiry: expiry,
 	}
+	// Use GORM's `OnConflict` to handle duplicate key violations
+	res := u.db.Clauses(
+		clause.OnConflict{
+			Columns:   []clause.Column{{Name: "userid"}},                     // Conflict on `user_id`
+			DoUpdates: clause.AssignmentColumns([]string{"token", "expiry"}), // Update these fields
+		},
+	).Create(&session)
 
-	res := u.db.Create(&session)
 	if res.Error != nil {
-		fmt.Println("Error inserting new session", res.Error)
+		fmt.Println("Error inserting/updating session:", res.Error)
 		return res.Error
 	}
 	return nil
 }
+
 func (u MyModel) QueryLastWorkoutId(UserID uint) (uint, error) {
 	var lastWorkoutId uint
 	res := u.db.Model(&Workouts{}).
