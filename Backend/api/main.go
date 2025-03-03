@@ -39,13 +39,22 @@ func main() {
 	_ = srv.ListenAndServe()
 }
 
+func (app *application) AuthenticationOptionsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+}
+
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 	router.HandlerFunc(http.MethodPost, "/signup", app.signupHandler)
-	router.HandlerFunc(http.MethodPost, "/Authenticate", app.AuthenticationHandler)
-	router.HandlerFunc(http.MethodGet, "/Dashboard", app.DashboardHandler)
+	router.HandlerFunc(http.MethodPost, "/authenticate", app.AuthenticationHandler)
+	router.HandlerFunc(http.MethodOptions, "/authenticate", app.AuthenticationOptionsHandler)
+	router.HandlerFunc(http.MethodGet, "/dashboard", app.DashboardHandler)
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
-	router.HandlerFunc(http.MethodDelete, "/deleteAccount", app.deleteHandler)
-	router.HandlerFunc(http.MethodPost, "/addWorkout", app.AddWorkoutHandler)
+	router.HandlerFunc(http.MethodDelete, "/delete-account", app.deleteHandler)
+	router.HandlerFunc(http.MethodPost, "/add-workout", app.AddWorkoutHandler)
 	return router
 }
