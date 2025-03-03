@@ -11,7 +11,7 @@ import (
 
 func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5174")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -45,11 +45,11 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 	expiresAt := time.Now().Add(48 * time.Hour)
 
 	//// Delete existing session if exists
-	//if sess, err := app.Session(w, r); err == nil {
-	//	if err := app.Models.UserModel.DeleteSession(sess); err != nil {
-	//		log.Printf("Failed to delete old session: %v", err)
-	//	}
-	//}
+	if sess, err := app.Session(w, r); err == nil {
+		if err := app.Models.UserModel.DeleteSession(sess); err != nil {
+			log.Printf("Failed to delete old session: %v", err)
+		}
+	}
 	err1 := app.Models.UserModel.InsertSession(user.ID, sessionToken, expiresAt)
 	if err1 != nil {
 		log.Println("Failed to insert session:", err1)
