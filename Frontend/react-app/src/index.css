@@ -2,7 +2,7 @@
 :root {
   font-family: "Lekton", monospace;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 600;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -30,6 +30,13 @@ body {
 }
 
 h1 {
-  font-size: 4em;
-  line-height: 1.1;
+  font-size: 3em;
+  /* line-height: 1.1; */
+}
+h2 {
+  font-size: 2.5em;
+}
+
+h3 {
+  font-size: 1.5em;
 }

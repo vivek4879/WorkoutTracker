@@ -11,6 +11,11 @@ import (
 
 func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5174")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+
 	var input struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -30,7 +35,7 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 
 	match, err := app.PasswordHasher.Compare(input.Password, user.Password)
 	if err != nil {
-		app.sendErrorResponse(w, http.StatusUnauthorized, "error\": \"Invalid email or password")
+		app.sendErrorResponse(w, http.StatusUnauthorized, "error:Invalid email or password")
 		log.Printf("Incorrect Password for user: %s ", user.Email)
 		return
 	}
@@ -39,15 +44,23 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 	sessionToken := uuid.NewString()
 	expiresAt := time.Now().Add(48 * time.Hour)
 
+	//// Delete existing session if exists
+	if sess, err := app.Session(w, r); err == nil {
+		if err := app.Models.UserModel.DeleteSession(sess); err != nil {
+			log.Printf("Failed to delete old session: %v", err)
+		}
+	}
 	err1 := app.Models.UserModel.InsertSession(user.ID, sessionToken, expiresAt)
 	if err1 != nil {
 		log.Println("Failed to insert session:", err1)
 		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal server error")
+		return
 	}
 	cookie := http.Cookie{
-		Name:    "session_token",
-		Value:   sessionToken,
-		Expires: expiresAt,
+		Name:     "session_token",
+		Value:    sessionToken,
+		Expires:  expiresAt,
+		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
 	response := map[string]string{

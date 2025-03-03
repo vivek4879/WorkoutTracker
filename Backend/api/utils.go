@@ -47,6 +47,11 @@ func Hashing(password string) string {
 
 func (app *application) Session(w http.ResponseWriter, r *http.Request) (sess internal.Sessions, err error) {
 	cookie, err := r.Cookie("session_token")
+	if cookie == nil || err != nil {
+		fmt.Println("cookie not found/error occurred while getting session_token")
+	} else {
+		fmt.Println("cookie found " + cookie.Value)
+	}
 	if err != nil {
 		// errors.Is() checks if error matches a specific type even if its wrapped inside another error
 		if errors.Is(err, http.ErrNoCookie) {
