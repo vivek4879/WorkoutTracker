@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import axios from "axios";
 import { useState } from "react";
 
 const Login = () => {
@@ -7,11 +8,31 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [token, setToken] = useState("");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // navigate("/dashboard");
-    console.log(email);
-    console.log(password);
+    if (error === "") {
+      try {
+        const response = await axios.post(
+          "http://192.168.0.12:4000/authenticate",
+          {
+            email,
+            password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        // setToken(response.data.token); // Save JWT token
+        localStorage.setItem("token", response.data.token); // Store in localStorage
+        alert("Login successful");
+      } catch (error) {
+        alert(error.response?.data || error);
+      }
+    }
   };
   const handleSignUp = () => {
     navigate("/signup");
@@ -65,7 +86,7 @@ const Login = () => {
             />
           </div>
         </div>
-
+        <div>{token && <p style={{ color: "red" }}>{token}</p>}</div>
         <div className="forgot-password" onClick={handleForgotPass}>
           <div className="header">
             <Link>Forgot Password?</Link>
