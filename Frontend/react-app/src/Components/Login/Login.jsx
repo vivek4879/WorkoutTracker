@@ -12,26 +12,30 @@ const Login = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const handleLogin = async () => {
     // navigate("/dashboard");
-    if (error === "") {
-      try {
-        const response = await axios.post(
-          "http://192.168.0.12:4000/authenticate",
-          {
-            email,
-            password,
+    try {
+      const response = await axios.post(
+        "http://192.168.0.12:4000/authenticate",
+        {
+          email,
+          password,
+        },
+
+        {
+          headers: {
+            "Content-Type": "application/json",
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        // setToken(response.data.token); // Save JWT token
-        localStorage.setItem("token", response.data.token); // Store in localStorage
-        alert("Login successful");
-      } catch (error) {
-        alert(error.response?.data || error);
-      }
+          withCredentials: true,
+        }
+      );
+      setToken(response.data.token); // Save JWT token
+
+      console.log(token);
+      localStorage.setItem("token", response.data.token); // Store in localStorage
+      // alert("Login successful");
+      navigate("/dashboard");
+    } catch (error) {
+      alert(error.response?.data || error);
+      // console.log(JSON.stringify(error));
     }
   };
   const handleSignUp = () => {
@@ -69,6 +73,7 @@ const Login = () => {
           <div className="input">
             <input
               type="email"
+              data-testid="email"
               value={email}
               onChange={handleEmailChange}
               placeholder="Email"
@@ -79,6 +84,7 @@ const Login = () => {
           <div className="input">
             <input
               type="password"
+              data-testid="password"
               placeholder="Password"
               value={password}
               onChange={handleChangePassword}
@@ -94,7 +100,11 @@ const Login = () => {
         </div>
 
         <div className="submit-container">
-          <div className="submit-button" onClick={handleLogin}>
+          <div
+            className="submit-button"
+            data-testid="loginButton"
+            onClick={handleLogin}
+          >
             Login
           </div>
           <div className="submit-button gray" onClick={handleSignUp}>
