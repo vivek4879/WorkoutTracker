@@ -1,8 +1,13 @@
 import Calendar from "./Calendar/Calendar";
 import { Link } from "react-router-dom";
+// import Calendar from "./Calendar/Calendar";
 import "./Dashboard.css";
+import { useEffect } from "react";
 
 const Dashboard = () => {
+  useEffect(() => {
+    document.title = "Dashboard | My App";
+  }, []);
   return (
     <div className="container">
       <div className="container">

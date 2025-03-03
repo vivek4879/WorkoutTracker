@@ -1,136 +1,97 @@
 import "./Calendar.css";
-
-const Calendar = () => {
+function Calendar() {
+  const date = new Date();
+  const days = date.getDate();
+  const newDate = new Date(date.getTime() - days * 24 * 60 * 60 * 1000);
+  var offset = newDate.getDay();
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const week1 = [1, 2, 3, 4, 5, 6, 7];
   return (
     <div className="calContainer">
       <div className="calendar">
         <div className="week">
-          <div className="calBox dayBox">Mon</div>
-          <div className="calBox dayBox">Tue</div>
-          <div className="calBox dayBox">Wed</div>
-          <div className="calBox dayBox">Thu</div>
-          <div className="calBox dayBox">Fri</div>
-          <div className="calBox dayBox">Sat</div>
-          <div className="calBox dayBox today">Sun</div>
+          {daysOfWeek.map((day) => (
+            <div className="calBox dayBox" key={day}>
+              <div>
+                <p>{day}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="week">
+          {week1.map((num) => (
+            <div className="calBox" key={num}>
+              {num - offset > 0 && (
+                <div>
+                  <p>{num - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="week">
+          {week1.map((num) => (
+            <div className="calBox" key={num + 7}>
+              {num + 7 - offset > 0 && (
+                <div>
+                  <p>{num + 7 - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="week">
+          {week1.map((num) => (
+            <div className="calBox" key={num + 14}>
+              {num + 14 - offset > 0 && (
+                <div>
+                  <p>{num + 14 - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="week">
+          {week1.map((num) => (
+            <div className="calBox" key={num + 21}>
+              {num + 21 - offset > 0 && (
+                <div>
+                  <p>{num + 21 - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="week">
+          {week1.map((num) => (
+            <div className="calBox" key={num + 28}>
+              {num + 28 - offset > 0 && (
+                <div>
+                  <p>{num + 28 - offset}</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
         <div className="week">
           <div className="calBox">
-            <p>1</p>
+            {36 - offset > 0 && (
+              <div>
+                <p>{36 - offset}</p>
+              </div>
+            )}
           </div>
           <div className="calBox">
-            <p>2</p>
-          </div>
-          <div className="calBox">
-            <p>3</p>
-          </div>
-          <div className="calBox">
-            <p>4</p>
-          </div>
-          <div className="calBox">
-            <p>5</p>
-          </div>
-          <div className="calBox">
-            <p>6</p>
-          </div>
-          <div className="calBox">
-            <p>7</p>
-          </div>
-        </div>
-        <div className="week">
-          <div className="calBox">
-            <p>8</p>
-          </div>
-          <div className="calBox">
-            <p>9</p>
-          </div>
-          <div className="calBox">
-            <p>10</p>
-          </div>
-          <div className="calBox">
-            <p>11</p>
-          </div>
-          <div className="calBox">
-            <p>12</p>
-          </div>
-          <div className="calBox">
-            <p>13</p>
-          </div>
-          <div className="calBox">
-            <p>14</p>
-          </div>
-        </div>
-        <div className="week">
-          <div className="calBox">
-            <p>15</p>
-          </div>
-          <div className="calBox">
-            <p>16</p>
-          </div>
-          <div className="calBox">
-            <p>17</p>
-          </div>
-          <div className="calBox">
-            <p>18</p>
-          </div>
-          <div className="calBox">
-            <p>19</p>
-          </div>
-          <div className="calBox">
-            <p>20</p>
-          </div>
-          <div className="calBox">
-            <p>21</p>
-          </div>
-        </div>
-        <div className="week">
-          <div className="calBox">
-            <p>22</p>
-          </div>
-          <div className="calBox">
-            <p>23</p>
-          </div>
-          <div className="calBox">
-            <p>24</p>
-          </div>
-          <div className="calBox">
-            <p>25</p>
-          </div>
-          <div className="calBox">
-            <p>26</p>
-          </div>
-          <div className="calBox">
-            <p>27</p>
-          </div>
-          <div className="calBox">
-            <p>28</p>
-          </div>
-        </div>
-        <div className="week">
-          <div className="calBox">
-            <p>29</p>
-          </div>
-          <div className="calBox">
-            <p>30</p>
-          </div>
-          <div className="calBox">
-            <p>31</p>
-          </div>
-          <div className="calBox">
-            <p></p>
-          </div>
-          <div className="calBox">
-            <p></p>
-          </div>
-          <div className="calBox">
-            <p></p>
-          </div>
-          <div className="calBox">
-            <p></p>
+            {37 - offset > 0 && (
+              <div>
+                <p>{37 - offset}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default Calendar;
