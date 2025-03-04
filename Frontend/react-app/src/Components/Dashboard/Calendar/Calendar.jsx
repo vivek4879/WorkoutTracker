@@ -85,11 +85,7 @@ function Calendar() {
             )}
           </div>
           <div className="calBox">
-            {37 - offset > 0 && (
-              <div>
-                <p>{37 - offset}</p>
-              </div>
-            )}
+            {37 - offset > 0 && <div>{/* <p>{37 - offset}</p> */}</div>}
           </div>
         </div>
       </div>

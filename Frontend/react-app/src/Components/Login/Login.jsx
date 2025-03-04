@@ -3,7 +3,7 @@ import "./Login.css";
 import axios from "axios";
 import { useState } from "react";
 
-const Login = () => {
+function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,7 +11,6 @@ const Login = () => {
   const [token, setToken] = useState("");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const handleLogin = async () => {
-    // navigate("/dashboard");
     try {
       const response = await axios.post(
         "http://192.168.0.12:4000/authenticate",
@@ -28,14 +27,11 @@ const Login = () => {
         }
       );
       setToken(response.data.token); // Save JWT token
-
       console.log(token);
       localStorage.setItem("token", response.data.token); // Store in localStorage
-      // alert("Login successful");
       navigate("/dashboard");
     } catch (error) {
       alert(error.response?.data || error);
-      // console.log(JSON.stringify(error));
     }
   };
   const handleSignUp = () => {
@@ -114,6 +110,6 @@ const Login = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Login;
