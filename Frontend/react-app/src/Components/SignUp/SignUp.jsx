@@ -3,10 +3,13 @@ import { useState } from "react";
 import "./SignUp.css";
 const SignUp = () => {
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setError] = useState("");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const navigate = useNavigate();
-  const handleChange = (e) => {
+  const passwordRegex =
+    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/;
+  const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
 
@@ -17,14 +20,26 @@ const SignUp = () => {
       setError("");
     }
   };
+
+  const handleChangePassword = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    // Validate email
+    if (!passwordRegex.test(value)) {
+      setError("Please enter a valid password.");
+    } else {
+      setError("");
+    }
+  };
   const handleSignUp = () => {
     // Normally, you'd validate the inputs and create an account before navigating
-    navigate("/dashboard");
-  };
-  const handleLogin = () => {
-    // Normally, you'd validate credentials before navigating
     navigate("/login");
   };
+  // const handleLogin = () => {
+  //   // Normally, you'd validate credentials before navigating
+  //   navigate("/login");
+  // };
 
   return (
     <div className="container">
@@ -48,14 +63,22 @@ const SignUp = () => {
             <input
               type="email"
               value={email}
-              onChange={handleChange}
+              onChange={handleEmailChange}
               placeholder="Email"
               required
             />
           </div>
-          <div>{error && <p style={{ color: "red" }}>{error}</p>}</div>
+          <div>
+            {emailError && <p style={{ color: "red" }}>{emailError}</p>}
+          </div>
           <div className="input">
-            <input type="password" placeholder="Password" required />
+            <input
+              type="password"
+              value={password}
+              onChange={handleChangePassword}
+              placeholder="Password"
+              required
+            />
           </div>
           <div></div>
         </div>
@@ -63,9 +86,9 @@ const SignUp = () => {
           <div className="submit-button" onClick={handleSignUp}>
             Sign Up
           </div>
-          <div className="submit-button gray" onClick={handleLogin}>
+          {/* <div className="submit-button gray" onClick={handleLogin}>
             Login
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
