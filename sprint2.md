@@ -1,5 +1,50 @@
 ## Detail work completed in Sprint 2
 
+# Frontend Sprint Summary
+
+## 1.1 Login Page Integration
+
+- **What Was Done:**
+  - Developed and integrated the login page with the backend API.
+  - Implemented secure authentication and error handling for user sign-ins.
+- **Purpose:**
+  - To ensure safe access and seamless communication with backend services.
+
+## 1.2 Implementation of Interactive Calendar
+
+- **What Was Done:**
+  - Created an interactive calendar component on the dashboard from scratch.
+  - Enabled dynamic date selection to help users schedule and view workouts.
+- **Challenges Faced:**
+  - Faced logical challenges when rendering the calendar, such as managing date sequences and component state.
+  - Resolved issues related to date format consistency and ensuring responsiveness across different devices.
+
+## 1.3 Unit Testing Transition: Jest to Vitest
+
+- **What Was Done:**
+  - Initially attempted unit testing with Jest.
+- **Problems Encountered:**
+  - Experienced slow performance and compatibility issues with Jest.
+- **Resolution:**
+  - Transitioned to Vitest for faster test execution and smoother integration.
+  - Rewrote unit tests for key components like the login page and calendar using Vitest.
+
+## 1.4 Integration Testing with Cypress
+
+- **What Was Done:**
+  - Implemented end-to-end integration tests using Cypress.
+  - Simulated full user journeys, from logging in to navigating the dashboard.
+- **Purpose:**
+  - To ensure all components work well together in real user scenarios.
+
+## 1.5 API Response Handling
+
+- **What Was Done:**
+  - Standardized handling of API responses for both errors and successes.
+  - Added clear user feedback messages to inform users about the outcomes of their actions.
+- **Purpose:**
+  - To improve the user experience by providing consistent and informative notifications.
+
 ### 1. Backend
 
 In the Backend this sprint focused on implementing an interface for user management, developing workout related functionality, adding structured response handling, defining some new database tables and tests for the functions.
