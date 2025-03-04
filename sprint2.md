@@ -1,6 +1,7 @@
-## Detail work  completed in Sprint 2
+## Detail work completed in Sprint 2
 
 ### 1. Backend
+
 In the Backend this sprint focused on implementing an interface for user management, developing workout related functionality, adding structured response handling, defining some new database tables and tests for the functions.
 
 **1.1 Implementing the `UserModelInterface`**
@@ -9,9 +10,10 @@ One of the key improvements made in Sprint 2 was defining and implementing an in
 With this interface in place, the MyModel struct was updated to implement all the required functions. This implementation ensures that any future changes to database operations can be integrated seamlessly.
 
 #### Why was this interface introduced?
-* To standardize database operations across multiple models.
-* To enable mocking in unit tests, making the codebase more testable and maintainable.
-* To simplify future enhancements by allowing different database implementations to adhere to the same contract.
+
+- To standardize database operations across multiple models.
+- To enable mocking in unit tests, making the codebase more testable and maintainable.
+- To simplify future enhancements by allowing different database implementations to adhere to the same contract.
 
 **1.2 Implementation of `AddWorkoutHandler`**
 
@@ -30,15 +32,23 @@ The error response function handles API errors and returns JSON response. The su
 
 **1.5 Unit Testing and Testify library**
 
-I wrote unit tests using the Testify library to validate API behavior. The Testify library  provides mocking for database interactions, simplifies assertions with assert functions, and makes unit tests more readable and maintainable.
-
-
-
+I wrote unit tests using the Testify library to validate API behavior. The Testify library provides mocking for database interactions, simplifies assertions with assert functions, and makes unit tests more readable and maintainable.
 
 ### 2. Frontend
 
+## Unit Tests and Cypress Test for Frontend
 
-## Unit tests and Cypress test for frontend
+#### 1. Unit Tests for FrontEnd
+
+    1. Login Component: Ensures the Login page is rendered correctly.
+    2. SignUp Component: Ensures the SignUp page is rendered correctly.
+    3. ForgotPass Component: Ensures the ForgotPass page is rendered correctly.
+    4. Dashboard Component: Ensures the Dashboard page is rendered correctly.
+    5. Calendar Component: Ensures the Calendar page is rendered correctly.
+
+#### 2. Cypress Test for Integration Testing
+
+    1. Login: Go to Login Page, enter dummy credentials and make sure the user is directed to the Dashboard.
 
 ## Unit tests for backend
 
@@ -57,15 +67,14 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
     3.2. TestAddWorkoutHandler: Ensures users can add workouts.
 
 #### 4. Other Tests (in utils_test.go)
+
     4.1. TestSession: Validates session retrieval.
     4.2. TestHashing: Validates hashing of the password.
     4.3. TestSendErrorResponse: Checks if the function is sending the required error.
     4.4. TestSendSuccessResponse: Check if we receive a success response.
 
-
-
-
 ## Backend API Documentation
+
 ### API Endpoints
 
 ### <b>1. User Signup</b>
@@ -75,6 +84,7 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 <b>Description</b>: Registers a new user.
 
 <b>Request Body (JSON)</b>:
+
 ```
 {
   "Firstname": "John",
@@ -83,6 +93,7 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
   "Password": "securepassword"
 }
 ```
+
 <b>Response</b>:
 
 `201 Created` if signup is successful.
@@ -105,15 +116,15 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
   "Password": "securepassword"
 }
 ```
+
 <b>Response</b>:
 
-
-``` 
+```
 {
   "message": "Authentication successful",
   "session_token": "mock-session-token",
   "user_id": "1"
-} 
+}
 ```
 
 <b>Status Codes</b>:
@@ -144,13 +155,9 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 
 ### 4. Dashboard
 
-
-
 <b>Endpoint</b>: GET /dashboard
 
-
 <b>Description</b>: Fetches the user dashboard.
-
 
 <b>Response</b>:
 
@@ -159,12 +166,12 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
   "message": "Welcome to the dashboard page"
 }
 ```
+
 <b>Status Codes</b>:
 
 `200 OK` on success.
 
 `401 Unauthorized` if session is invalid.
-
 
 ### 5. Add Workout
 
@@ -191,6 +198,7 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 ```
 
 <b>Response</b>:
+
 ```
 {
   "message": "Workout added successfully"
@@ -212,14 +220,17 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 **Description**: Deletes an authenticated user's account and session.
 
 **Request Headers**:
+
 - `Cookie: session_token=<user_session_token>`
 
 **Response**:
+
 ```json
 {
   "message": "User successfully deleted"
 }
 ```
+
 <b>Status Codes</b>:
 
 `200 OK` on success.
@@ -228,4 +239,3 @@ I wrote unit tests using the Testify library to validate API behavior. The Testi
 `401 Unauthorized` if user retrieval fails.
 `401 Unauthorized` if deletion fails.
 `401 Unauthorized` if session deletion fails.
-
