@@ -1,8 +1,8 @@
 ## Detail work completed in Sprint 2
 
-# Frontend Sprint Summary
+### 1. Frontend
 
-## 1.1 Login Page Integration
+#### 1.1 Login Page Integration
 
 - **What Was Done:**
   - Developed and integrated the login page with the backend API.
@@ -10,7 +10,7 @@
 - **Purpose:**
   - To ensure safe access and seamless communication with backend services.
 
-## 1.2 Implementation of Interactive Calendar
+#### 1.2 Implementation of Interactive Calendar
 
 - **What Was Done:**
   - Created an interactive calendar component on the dashboard from scratch.
@@ -19,7 +19,7 @@
   - Faced logical challenges when rendering the calendar, such as managing date sequences and component state.
   - Resolved issues related to date format consistency and ensuring responsiveness across different devices.
 
-## 1.3 Unit Testing Transition: Jest to Vitest
+#### 1.3 Unit Testing Transition: Jest to Vitest
 
 - **What Was Done:**
   - Initially attempted unit testing with Jest.
@@ -29,7 +29,7 @@
   - Transitioned to Vitest for faster test execution and smoother integration.
   - Rewrote unit tests for key components like the login page and calendar using Vitest.
 
-## 1.4 Integration Testing with Cypress
+#### 1.4 Integration Testing with Cypress
 
 - **What Was Done:**
   - Implemented end-to-end integration tests using Cypress.
@@ -37,7 +37,7 @@
 - **Purpose:**
   - To ensure all components work well together in real user scenarios.
 
-## 1.5 API Response Handling
+#### 1.5 API Response Handling
 
 - **What Was Done:**
   - Standardized handling of API responses for both errors and successes.
@@ -45,11 +45,11 @@
 - **Purpose:**
   - To improve the user experience by providing consistent and informative notifications.
 
-### 1. Backend
+### 2. Backend
 
 In the Backend this sprint focused on implementing an interface for user management, developing workout related functionality, adding structured response handling, defining some new database tables and tests for the functions.
 
-**1.1 Implementing the `UserModelInterface`**
+**2.1 Implementing the `UserModelInterface`**
 
 One of the key improvements made in Sprint 2 was defining and implementing an interface (UserModelInterface) to enforce a standard structure for user-related operations in the database.This interface, located in models.go, defines essential functions for managing users, sessions, and workouts.
 With this interface in place, the MyModel struct was updated to implement all the required functions. This implementation ensures that any future changes to database operations can be integrated seamlessly.
@@ -60,26 +60,25 @@ With this interface in place, the MyModel struct was updated to implement all th
 - To enable mocking in unit tests, making the codebase more testable and maintainable.
 - To simplify future enhancements by allowing different database implementations to adhere to the same contract.
 
-**1.2 Implementation of `AddWorkoutHandler`**
+**2.2 Implementation of `AddWorkoutHandler`**
 
 Introduced the AddWorkoutHandler in route_access.go to allow authenticated users to add workouts.
 It Validates User Session before allowing modifications, parses JSON input to extract workout details,
 Inserts Data into `workouts` and `workout_to_user` tables, and return appropriate success/error messages.
 
-**1.3 New Tables for Workouts & Exercises**
+**2.3 New Tables for Workouts & Exercises**
 
 To support workouts, I introduced two new tables in models.go which store information about workouts associated with a user.
 
-**1.4 Implementing Error and Success Response Functions**
+**2.4 Implementing Error and Success Response Functions**
 
 To standardize API responses, we introduced sendErrorResponse and sendSuccessResponse functions in utils.go.
 The error response function handles API errors and returns JSON response. The success response function handles successful API responses.
 
-**1.5 Unit Testing and Testify library**
+**2.5 Unit Testing and Testify library**
 
 I wrote unit tests using the Testify library to validate API behavior. The Testify library provides mocking for database interactions, simplifies assertions with assert functions, and makes unit tests more readable and maintainable.
 
-### 2. Frontend
 
 ## Unit Tests and Cypress Test for Frontend
 
