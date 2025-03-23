@@ -18,6 +18,7 @@ type UserModelInterface interface {
 	DeleteUser(u Users) error
 	InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, error)
 	InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error
+	UpsertUserBest(userID, exerciseID uint, weight, reps float64) error
 }
 
 // Ensure MyModel implements UserModelInterface
