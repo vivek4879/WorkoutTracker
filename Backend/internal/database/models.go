@@ -104,8 +104,10 @@ type ExerciseData struct {
 }
 
 type UserBests struct {
-	UserId            uint    `json:"userid"`
-	ExerciseId        uint    `json:"exerciseid"`
-	BestWeight        float64 `json:"bestweight"`
-	CorrespondingReps float64 `json:"reps"`
+	UserId            uint      `gorm:"column:userid;primaryKey" json:"userid"`
+	Ex_Id             uint      `gorm:"column:ex_id;primaryKey" json:"exerciseid"`
+	BestWeight        float64   `json:"bestweight"`
+	CorrespondingReps float64   `json:"reps"`
+	User              Users     `gorm:"foreignKey:UserId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Exercise          Exercises `gorm:"foreignKey:Ex_Id;references:ExerciseId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
