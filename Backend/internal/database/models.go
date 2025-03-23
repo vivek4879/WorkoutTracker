@@ -102,3 +102,10 @@ type ExerciseData struct {
 	Sets       []WorkoutSet `json:"sets"`
 	CreatedAt  time.Time    `json:"created_at"`
 }
+
+type UserBests struct {
+	UserId            uint    `json:"userid"`
+	ExerciseId        uint    `json:"exerciseid"`
+	BestWeight        float64 `json:"bestweight"`
+	CorrespondingReps float64 `json:"reps"`
+}
