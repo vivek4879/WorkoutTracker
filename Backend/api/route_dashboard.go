@@ -98,7 +98,7 @@ func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request
 	app.sendSuccessResponse(w, http.StatusCreated, response)
 }
 
-// Handler to return users best in that particular exercise Id.
+// AddHandler Handler to return users best in that particular exerciseId.
 func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 	// Validate Session
 	sess, err := app.Session(w, r)
@@ -106,7 +106,7 @@ func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error getting session: %v\n", err)
 		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
 		return
-	}2
+	}
 
 	// Parse exercise ID from query params
 	exIDStr := r.URL.Query().Get("exercise_id")
