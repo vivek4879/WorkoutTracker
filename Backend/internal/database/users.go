@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+func (u MyModel) QueryUserBest(UserId uint, Ex_Id uint) (bestweight float64, reps float64, err error) {
+	var bestData UserBests
+	res := u.db.Where("userid = ? AND ex_id = ?", UserId, Ex_Id).First(&bestData)
+	if res.Error != nil {
+		fmt.Println("Error fetching user's best:", res.Error)
+		return 0., 0., res.Error
+	}
+	return bestData.BestWeight, bestData.CorrespondingReps, nil
+}
+
 func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	session := Sessions{
 		UserID: Id,

@@ -12,7 +12,7 @@ type UserModelInterface interface {
 	Query(email string) (*Users, error)
 	InsertSession(Id uint, Token string, expiry time.Time) error
 	QuerySession(SessionToken string) (*Sessions, error)
-
+	QueryUserBest(UserId uint, Ex_Id uint) (bestweight float64, reps float64, err error)
 	DeleteSession(s Sessions) error
 	QueryUserId(userID uint) (*Users, error)
 	DeleteUser(u Users) error
