@@ -11,6 +11,11 @@ type MockUserModel struct {
 	mock.Mock
 }
 
+func (m *MockUserModel) QueryUserBest(UserId uint, Ex_Id uint) (float64, float64, error) {
+	args := m.Called(UserId, Ex_Id)
+	return args.Get(0).(float64), args.Get(1).(float64), args.Error(2)
+}
+
 // Mock function for user signup
 func (m *MockUserModel) Insert(firstname, lastname, email, password string) error {
 	args := m.Called(firstname, lastname, email, password)
