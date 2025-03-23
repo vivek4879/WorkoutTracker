@@ -12,12 +12,13 @@ type UserModelInterface interface {
 	Query(email string) (*Users, error)
 	InsertSession(Id uint, Token string, expiry time.Time) error
 	QuerySession(SessionToken string) (*Sessions, error)
-
+	QueryUserBest(UserId uint, Ex_Id uint) (bestweight float64, reps float64, err error)
 	DeleteSession(s Sessions) error
 	QueryUserId(userID uint) (*Users, error)
 	DeleteUser(u Users) error
 	InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, error)
 	InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error
+	UpsertUserBest(userID, exerciseID uint, weight, reps float64) error
 }
 
 // Ensure MyModel implements UserModelInterface
@@ -77,13 +78,10 @@ type Workouts struct {
 	Exercise          Exercises     `gorm:"foreignKey:CurrentExerciseId;references:ExerciseId;constraint:OnDelete:CASCADE"`
 }
 
-//func (Workouts) TableName() string {
-//	return "workouts"
-//}
-
 type Exercises struct {
-	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
-	ExerciseName string `gorm:"column:exercisename"`
+	ExerciseId       uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
+	ExerciseName     string `gorm:"column:exercisename"`
+	ExerciseImageURL string `gorm:"column:exerciseimageurl"`
 }
 
 // struct to capture frontend data
@@ -106,7 +104,11 @@ type ExerciseData struct {
 	CreatedAt  time.Time    `json:"created_at"`
 }
 
-type Exercise struct {
-	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
-	ExerciseName string `gorm:"column:exercisename;unique;not null"`
+type UserBests struct {
+	UserId            uint      `gorm:"column:userid;primaryKey" json:"userid"`
+	Ex_Id             uint      `gorm:"column:ex_id;primaryKey" json:"exerciseid"`
+	BestWeight        float64   `json:"bestweight"`
+	CorrespondingReps float64   `json:"reps"`
+	User              Users     `gorm:"foreignKey:UserId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Exercise          Exercises `gorm:"foreignKey:Ex_Id;references:ExerciseId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
