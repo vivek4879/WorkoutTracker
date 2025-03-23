@@ -17,7 +17,7 @@ func (u MyModel) UpsertUserBest(userID, exerciseID uint, weight, reps float64) e
 
 	//PostgreSQL upsert using GORM
 	return u.db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "user_id"}, {Name: "exercise_id"}},
+		Columns:   []clause.Column{{Name: "userid"}, {Name: "ex_id"}},
 		DoUpdates: clause.AssignmentColumns([]string{"best_weight", "corresponding_reps"}),
 	}).Create(&best).Error
 }

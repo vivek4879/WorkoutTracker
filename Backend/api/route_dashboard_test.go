@@ -95,10 +95,17 @@ func TestAddWorkoutHandler(t *testing.T) {
 
 	// Mock session
 	mockSession := &internal.Sessions{UserID: 1}
+	exerciseID := uint(101)
 
 	// Mock workouts input
 	workoutData := []internal.ExerciseData{
-		{ExerciseId: 101, Sets: []internal.WorkoutSet{{SetNo: 1, Repetitions: 10, Weight: 50}}},
+		{
+			ExerciseId: exerciseID,
+			Sets: []internal.WorkoutSet{
+				{SetNo: 1, Repetitions: 10, Weight: 50},
+				{SetNo: 2, Repetitions: 8, Weight: 60}, // max weight
+			},
+		},
 	}
 
 	// Mock workout entry IDs returned from InsertWorkout
@@ -112,6 +119,12 @@ func TestAddWorkoutHandler(t *testing.T) {
 
 	// Mock InsertWorkoutToUser to succeed
 	mockUserModel.On("InsertWorkoutToUser", mockSession.UserID, mockWorkoutEntryIDs).Return(nil)
+
+	// Mock QueryUserBest to return a lower best so the new one is inserted
+	mockUserModel.On("QueryUserBest", mockSession.UserID, exerciseID).Return(40.0, 10.0, nil)
+
+	// Mock UpsertUserBest to succeed
+	mockUserModel.On("UpsertUserBest", mockSession.UserID, exerciseID, 60.0, 8.0).Return(nil)
 
 	// Setup Application with Mock Model
 	mockModels := internal.Models{
@@ -156,7 +169,7 @@ func TestAddWorkoutHandler(t *testing.T) {
 		t.Errorf("Expected message %q, got %q", expectedMessage, response.Message)
 	}
 
-	// Ensure mock expectations were met
+	// Ensure all mock expectations were met
 	mockUserModel.AssertExpectations(t)
 }
 

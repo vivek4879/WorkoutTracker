@@ -82,6 +82,11 @@ func (m *MockUserModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint)
 	return args.Error(0)
 }
 
+func (m *MockUserModel) UpsertUserBest(userID uint, Ex_Id uint, weight float64, reps float64) error {
+	args := m.Called(userID, Ex_Id, weight, reps)
+	return args.Error(0)
+}
+
 //func setupTestDB() *gorm.DB {
 //	dsn := "host=localhost user=test password=test dbname=testdb port=5433 sslmode=disable"
 //	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
