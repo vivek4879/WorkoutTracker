@@ -77,13 +77,10 @@ type Workouts struct {
 	Exercise          Exercises     `gorm:"foreignKey:CurrentExerciseId;references:ExerciseId;constraint:OnDelete:CASCADE"`
 }
 
-//func (Workouts) TableName() string {
-//	return "workouts"
-//}
-
 type Exercises struct {
-	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
-	ExerciseName string `gorm:"column:exercisename"`
+	ExerciseId       uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
+	ExerciseName     string `gorm:"column:exercisename"`
+	ExerciseImageURL string `gorm:"column:exerciseimageurl"`
 }
 
 // struct to capture frontend data
@@ -104,9 +101,4 @@ type ExerciseData struct {
 	ExerciseId uint         `json:"exerciseid"`
 	Sets       []WorkoutSet `json:"sets"`
 	CreatedAt  time.Time    `json:"created_at"`
-}
-
-type Exercise struct {
-	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
-	ExerciseName string `gorm:"column:exercisename;unique;not null"`
 }

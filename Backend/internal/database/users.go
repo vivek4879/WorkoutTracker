@@ -7,21 +7,6 @@ import (
 	"time"
 )
 
-//func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
-//	session := Sessions{
-//		UserID: Id,
-//		Token:  Token,
-//		Expiry: expiry,
-//	}
-//
-//	res := u.db.Create(&session)
-//	if res.Error != nil {
-//		fmt.Println("Error inserting new session", res.Error)
-//		return res.Error
-//	}
-//	return nil
-//}
-
 func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	session := Sessions{
 		UserID: Id,
