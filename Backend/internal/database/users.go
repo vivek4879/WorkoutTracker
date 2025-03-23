@@ -7,6 +7,20 @@ import (
 	"time"
 )
 
+func (u MyModel) UpsertUserBest(userID, exerciseID uint, weight, reps float64) error {
+	best := UserBests{
+		UserId:            userID,
+		Ex_Id:             exerciseID,
+		BestWeight:        weight,
+		CorrespondingReps: reps,
+	}
+
+	//PostgreSQL upsert using GORM
+	return u.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "user_id"}, {Name: "exercise_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"best_weight", "corresponding_reps"}),
+	}).Create(&best).Error
+}
 func (u MyModel) QueryUserBest(UserId uint, Ex_Id uint) (bestweight float64, reps float64, err error) {
 	var bestData UserBests
 	res := u.db.Where("userid = ? AND ex_id = ?", UserId, Ex_Id).First(&bestData)
