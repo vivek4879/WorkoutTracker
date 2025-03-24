@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+func (u MyModel) GetAllExercises() ([]Exercises, error) {
+	var exercises []Exercises
+	result := u.db.Find(&exercises)
+	return exercises, result.Error
+}
+
 func (u MyModel) UpsertUserBest(userID, exerciseID uint, weight, reps float64) error {
 	best := UserBests{
 		UserId:            userID,

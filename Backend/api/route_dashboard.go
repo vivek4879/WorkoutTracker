@@ -137,3 +137,29 @@ func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	app.sendSuccessResponse(w, http.StatusOK, response)
 }
+func (app *application) GetAllExercisesHandler(w http.ResponseWriter, r *http.Request) {
+	exercises, err := app.Models.UserModel.GetAllExercises()
+	if err != nil {
+		log.Printf("Error fetching exercises: %v\n", err)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve exercises")
+		return
+	}
+
+	// Include ID, Name, and URL in the response
+	type ExerciseDTO struct {
+		ID   uint   `json:"exercise_id"`
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	}
+
+	var response []ExerciseDTO
+	for _, ex := range exercises {
+		response = append(response, ExerciseDTO{
+			ID:   ex.ExerciseId,
+			Name: ex.ExerciseName,
+			URL:  ex.ExerciseImageURL,
+		})
+	}
+
+	app.sendSuccessResponse(w, http.StatusOK, response)
+}
