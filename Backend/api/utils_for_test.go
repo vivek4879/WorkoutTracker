@@ -11,6 +11,11 @@ type MockUserModel struct {
 	mock.Mock
 }
 
+func (m *MockUserModel) GetAllExercises() ([]database.Exercises, error) {
+	args := m.Called()
+	return args.Get(0).([]database.Exercises), args.Error(1)
+}
+
 func (m *MockUserModel) QueryUserBest(UserId uint, Ex_Id uint) (float64, float64, error) {
 	args := m.Called(UserId, Ex_Id)
 	return args.Get(0).(float64), args.Get(1).(float64), args.Error(2)
