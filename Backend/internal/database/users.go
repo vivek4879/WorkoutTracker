@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/lib/pq"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"time"
 )
@@ -108,6 +109,77 @@ func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, er
 		insertWorkoutIDs = append(insertWorkoutIDs, workout.WorkoutEntryID)
 	}
 	return insertWorkoutIDs, nil
+}
+func (u MyModel) UpdateMeasurements(userID uint, measurements Measurements) error {
+	// Create a struct for the updated measurements
+	updateFields := map[string]interface{}{}
+
+	// Only update the fields that are non-zero (i.e., provided by the user)
+	if measurements.Weight != nil {
+		updateFields["weight"] = measurements.Weight
+	}
+	if measurements.Neck != nil {
+		updateFields["neck"] = measurements.Neck
+	}
+	if measurements.Shoulders != nil {
+		updateFields["shoulders"] = measurements.Shoulders
+	}
+	if measurements.Chest != nil {
+		updateFields["chest"] = measurements.Chest
+	}
+	if measurements.LeftBicep != nil {
+		updateFields["left_bicep"] = measurements.LeftBicep
+	}
+	if measurements.RightBicep != nil {
+		updateFields["right_bicep"] = measurements.RightBicep
+	}
+	if measurements.UpperAbs != nil {
+		updateFields["upper_abs"] = measurements.UpperAbs
+	}
+	if measurements.LowerAbs != nil {
+		updateFields["lower_abs"] = measurements.LowerAbs
+	}
+	if measurements.Waist != nil {
+		updateFields["waist"] = measurements.Waist
+	}
+	if measurements.Hips != nil {
+		updateFields["hips"] = measurements.Hips
+	}
+	if measurements.LeftThigh != nil {
+		updateFields["left_thigh"] = measurements.LeftThigh
+	}
+	if measurements.RightThigh != nil {
+		updateFields["right_thigh"] = measurements.RightThigh
+	}
+	if measurements.LeftCalf != nil {
+		updateFields["left_calf"] = measurements.LeftCalf
+	}
+	if measurements.RightCalf != nil {
+		updateFields["right_calf"] = measurements.RightCalf
+	}
+
+	// Perform the update on the measurements table
+	result := u.db.Model(&Measurements{}).Where("userid = ?", userID).Updates(updateFields)
+	return result.Error
+}
+
+// GetMeasurements fetches the measurements for a given user
+func (u MyModel) GetMeasurements(userID uint) (Measurements, error) {
+	var measurements Measurements
+
+	// Query the measurements table for the user's data
+	result := u.db.Where("userid = ?", userID).First(&measurements)
+
+	// If no record found, return empty Measurements struct
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return Measurements{}, nil // Return an empty struct if not found
+		}
+		return Measurements{}, result.Error
+	}
+
+	// Return the found measurements
+	return measurements, nil
 }
 
 func (u MyModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error {
