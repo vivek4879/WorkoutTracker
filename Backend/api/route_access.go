@@ -15,27 +15,53 @@ func (app *application) signupHandler(w http.ResponseWriter, r *http.Request) {
 		Password  string `json:"password"`
 	}
 
+	// Decode the request body
 	dec := json.NewDecoder(r.Body)
 	dec.Decode(&input)
+
+	// Check if the email already exists using the existing Query method
 	_, err1 := app.Models.UserModel.Query(input.Email)
 	if err1 == nil {
+		// If email exists, return a conflict error
 		fmt.Printf("%s already exists\n", input.Email)
 		app.sendErrorResponse(w, http.StatusConflict, "Email already exists")
 		return
 	}
 
+	// Hash the user's password
 	hashedPassword := Hashing(input.Password)
-	err := app.Models.UserModel.Insert(input.FirstName, input.LastName, input.Email, hashedPassword)
-	fmt.Printf("User %s created", input.Email)
 
+	// Insert the user into the database
+	err := app.Models.UserModel.Insert(input.FirstName, input.LastName, input.Email, hashedPassword)
 	if err != nil {
-		fmt.Printf("User %s not created", input.Email)
+		// If user insert fails, return an internal server error
+		fmt.Printf("User %s not created\n", input.Email)
 		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
 	}
+
+	// Get the newly created user's ID using the email
+	userID, err := app.Models.UserModel.GetUserIDByEmail(input.Email)
+	if err != nil {
+		// If there's an error fetching user ID, return an internal server error
+		fmt.Printf("Error fetching userID for %s\n", input.Email)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	// Insert a blank entry into the measurements table for the new user
+	err = app.Models.UserModel.InsertBlankMeasurements(userID)
+	if err != nil {
+		// If there was an error inserting into measurements, return an internal server error
+		fmt.Printf("Error inserting blank measurements for user %d\n", userID)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	// Send success response
 	response := map[string]string{
 		"message": "User successfully created",
 	}
-
 	app.sendSuccessResponse(w, http.StatusOK, response)
 }
 

@@ -8,6 +8,56 @@ import (
 	"strconv"
 )
 
+func (app *application) UpdateMeasurementsHandler(w http.ResponseWriter, r *http.Request) {
+	// Validate Session
+	sess, err := app.Session(w, r)
+	if err != nil {
+		log.Printf("Error getting session: %v\n", err)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
+		return
+	}
+
+	// Decode updated measurements from the request body
+	var input database.Measurements
+	err = json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		app.sendErrorResponse(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	// Update measurements in the database
+	err = app.Models.UserModel.UpdateMeasurements(sess.UserID, input)
+	if err != nil {
+		log.Printf("Error updating measurements: %v\n", err)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to update measurements")
+		return
+	}
+
+	// Send a success response
+	app.sendSuccessResponse(w, http.StatusOK, map[string]string{"message": "Measurements updated successfully"})
+}
+
+func (app *application) GetMeasurementsHandler(w http.ResponseWriter, r *http.Request) {
+	// Validate Session
+	sess, err := app.Session(w, r)
+	if err != nil {
+		log.Printf("Error getting session: %v\n", err)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
+		return
+	}
+
+	// Retrieve measurements for the user
+	measurements, err := app.Models.UserModel.GetMeasurements(sess.UserID)
+
+	if err != nil {
+		log.Printf("Error fetching measurements: %v\n", err)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve measurements")
+		return
+	}
+	// Send the measurements back in the response
+	app.sendSuccessResponse(w, http.StatusOK, measurements)
+}
+
 func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	//Validate Session
 	sess, err := app.Session(w, r)
@@ -135,5 +185,31 @@ func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 		"best_weight": bestWeight,
 		"reps":        reps,
 	}
+	app.sendSuccessResponse(w, http.StatusOK, response)
+}
+func (app *application) GetAllExercisesHandler(w http.ResponseWriter, r *http.Request) {
+	exercises, err := app.Models.UserModel.GetAllExercises()
+	if err != nil {
+		log.Printf("Error fetching exercises: %v\n", err)
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve exercises")
+		return
+	}
+
+	// Include ID, Name, and URL in the response
+	type ExerciseDTO struct {
+		ID   uint   `json:"exercise_id"`
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	}
+
+	var response []ExerciseDTO
+	for _, ex := range exercises {
+		response = append(response, ExerciseDTO{
+			ID:   ex.ExerciseId,
+			Name: ex.ExerciseName,
+			URL:  ex.ExerciseImageURL,
+		})
+	}
+
 	app.sendSuccessResponse(w, http.StatusOK, response)
 }

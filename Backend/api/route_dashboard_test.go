@@ -12,14 +12,61 @@ import (
 )
 
 // Mock application with a session method
-//type MockApplication struct {
-//	application
-//	MockSession func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error)
-//}
 //
-//func (m *MockApplication) Session(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
-//	return m.MockSession(w, r)
-//}
+//	type MockApplication struct {
+//		application
+//		MockSession func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error)
+//	}
+//
+//	func (m *MockApplication) Session(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+//		return m.MockSession(w, r)
+//	}
+func TestGetAllExercisesHandler(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Sample mock data
+	exercises := []internal.Exercises{
+		{ExerciseId: 101, ExerciseName: "Bench Press", ExerciseImageURL: "https://s3.bucket/bench-press.png"},
+		{ExerciseId: 102, ExerciseName: "Deadlift", ExerciseImageURL: "https://s3.bucket/deadlift.png"},
+	}
+
+	// Expect the GetAllExercises call and return mock data
+	mockUserModel.On("GetAllExercises").Return(exercises, nil)
+
+	// Setup app
+	mockModels := internal.Models{UserModel: mockUserModel}
+	app := application{Models: mockModels}
+
+	// Create request
+	req := httptest.NewRequest("GET", "/exercises", nil)
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	app.GetAllExercisesHandler(rec, req)
+
+	// Assertions
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", rec.Code)
+	}
+
+	var response []map[string]interface{}
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	// Basic checks
+	if len(response) != 2 {
+		t.Errorf("Expected 2 exercises, got %d", len(response))
+	}
+
+	if response[0]["name"] != "Bench Press" || response[0]["url"] != "https://s3.bucket/bench-press.png" {
+		t.Errorf("Unexpected first exercise: %+v", response[0])
+	}
+
+	// Check mock expectations
+	mockUserModel.AssertExpectations(t)
+}
 
 func TestDashboardHandler(t *testing.T) {
 	mockUserModel := new(MockUserModel)
