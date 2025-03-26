@@ -48,14 +48,13 @@ func (app *application) GetMeasurementsHandler(w http.ResponseWriter, r *http.Re
 
 	// Retrieve measurements for the user
 	measurements, err := app.Models.UserModel.GetMeasurements(sess.UserID)
+
 	if err != nil {
 		log.Printf("Error fetching measurements: %v\n", err)
 		app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to retrieve measurements")
 		return
 	}
-
 	// Send the measurements back in the response
-	// Use JSON tags to omit empty fields
 	app.sendSuccessResponse(w, http.StatusOK, measurements)
 }
 
