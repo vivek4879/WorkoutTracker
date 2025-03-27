@@ -12,12 +12,16 @@ type UserModelInterface interface {
 	Query(email string) (*Users, error)
 	InsertSession(Id uint, Token string, expiry time.Time) error
 	QuerySession(SessionToken string) (*Sessions, error)
-
+	QueryUserBest(UserId uint, Ex_Id uint) (bestweight float64, reps float64, err error)
 	DeleteSession(s Sessions) error
 	QueryUserId(userID uint) (*Users, error)
 	DeleteUser(u Users) error
 	InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, error)
 	InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error
+	UpsertUserBest(userID, exerciseID uint, weight, reps float64) error
+	GetAllExercises() ([]Exercises, error)
+	GetMeasurements(userID uint) (Measurements, error)
+	UpdateMeasurements(userID uint, measurements Measurements) error
 }
 
 // Ensure MyModel implements UserModelInterface
@@ -59,6 +63,24 @@ type UserLogin struct {
 	Userid   uint
 }
 
+type Measurements struct {
+	UserID     uint     `gorm:"column:userid;primaryKey;not null" json:"userid"`
+	Weight     *float64 `gorm:"column:weight;" json:"weight,omitempty"`
+	Neck       *float64 `gorm:"column:neck;" json:"neck,omitempty"`
+	Shoulders  *float64 `gorm:"column:shoulders;" json:"shoulders,omitempty"`
+	Chest      *float64 `gorm:"column:chest;" json:"chest,omitempty"`
+	LeftBicep  *float64 `gorm:"column:left_bicep;" json:"left_bicep,omitempty"`
+	RightBicep *float64 `gorm:"column:right_bicep;" json:"right_bicep,omitempty"`
+	UpperAbs   *float64 `gorm:"column:upper_abs;" json:"upper_abs,omitempty"`
+	LowerAbs   *float64 `gorm:"column:lower_abs;" json:"lower_abs,omitempty"`
+	Waist      *float64 `gorm:"column:waist;" json:"waist,omitempty"`
+	Hips       *float64 `gorm:"column:hips;" json:"hips,omitempty"`
+	LeftThigh  *float64 `gorm:"column:left_thigh;" json:"left_thigh,omitempty"`
+	RightThigh *float64 `gorm:"column:right_thigh;" json:"right_thigh,omitempty"`
+	LeftCalf   *float64 `gorm:"column:left_calf;" json:"left_calf,omitempty"`
+	RightCalf  *float64 `gorm:"column:right_calf;" json:"right_calf,omitempty"`
+}
+
 type WorkoutToUser struct {
 	UserID                  uint     `gorm:"column:userid;primaryKey"`
 	WorkoutEntryIDSecondary uint     `gorm:"column:workout_entry_id_Secondary;primaryKey;"`
@@ -77,13 +99,10 @@ type Workouts struct {
 	Exercise          Exercises     `gorm:"foreignKey:CurrentExerciseId;references:ExerciseId;constraint:OnDelete:CASCADE"`
 }
 
-//func (Workouts) TableName() string {
-//	return "workouts"
-//}
-
 type Exercises struct {
-	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
-	ExerciseName string `gorm:"column:exercisename"`
+	ExerciseId       uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
+	ExerciseName     string `gorm:"column:exercisename"`
+	ExerciseImageURL string `gorm:"column:exerciseimageurl"`
 }
 
 // struct to capture frontend data
@@ -106,7 +125,11 @@ type ExerciseData struct {
 	CreatedAt  time.Time    `json:"created_at"`
 }
 
-type Exercise struct {
-	ExerciseId   uint   `gorm:"column:exerciseid;primaryKey;autoIncrement"`
-	ExerciseName string `gorm:"column:exercisename;unique;not null"`
+type UserBests struct {
+	UserId            uint      `gorm:"column:userid;primaryKey" json:"userid"`
+	Ex_Id             uint      `gorm:"column:ex_id;primaryKey" json:"exerciseid"`
+	BestWeight        float64   `json:"bestweight"`
+	CorrespondingReps float64   `json:"reps"`
+	User              Users     `gorm:"foreignKey:UserId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Exercise          Exercises `gorm:"foreignKey:Ex_Id;references:ExerciseId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }

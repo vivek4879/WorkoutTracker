@@ -1,4 +1,5 @@
 import Calendar from "./Calendar/Calendar";
+import { Link } from "react-router-dom";
 // import Calendar from "./Calendar/Calendar";
 import "./Dashboard.css";
 import { useEffect } from "react";
@@ -29,6 +30,13 @@ const Dashboard = () => {
           <a href="/login" style={{ float: "right" }}>
             Logout
           </a>
+          <Link style={{ float: "right" }} to="/profile">
+            Profile
+          </Link>
+          <Link style={{ float: "right" }} to="/usergoals">
+            UserGoal
+          </Link>
+          
         </div>
         <div className="Logo">
           <h1 className="Page-Heading">Gambare!</h1>

@@ -58,5 +58,10 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
 	router.HandlerFunc(http.MethodDelete, "/delete-account", app.deleteHandler)
 	router.HandlerFunc(http.MethodPost, "/add-workout", app.AddWorkoutHandler)
+	router.HandlerFunc(http.MethodGet, "/user-best", app.AddHandler)
+	router.HandlerFunc(http.MethodGet, "/exercises", app.GetAllExercisesHandler)
+	router.HandlerFunc(http.MethodGet, "/measurements", app.GetMeasurementsHandler)
+	router.HandlerFunc(http.MethodPut, "/update-measurements", app.UpdateMeasurementsHandler)
+
 	return router
 }

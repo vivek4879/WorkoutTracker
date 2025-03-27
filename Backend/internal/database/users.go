@@ -3,24 +3,40 @@ package database
 import (
 	"fmt"
 	"github.com/lib/pq"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"time"
 )
 
-//func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
-//	session := Sessions{
-//		UserID: Id,
-//		Token:  Token,
-//		Expiry: expiry,
-//	}
-//
-//	res := u.db.Create(&session)
-//	if res.Error != nil {
-//		fmt.Println("Error inserting new session", res.Error)
-//		return res.Error
-//	}
-//	return nil
-//}
+func (u MyModel) GetAllExercises() ([]Exercises, error) {
+	var exercises []Exercises
+	result := u.db.Find(&exercises)
+	return exercises, result.Error
+}
+
+func (u MyModel) UpsertUserBest(userID, exerciseID uint, weight, reps float64) error {
+	best := UserBests{
+		UserId:            userID,
+		Ex_Id:             exerciseID,
+		BestWeight:        weight,
+		CorrespondingReps: reps,
+	}
+
+	//PostgreSQL upsert using GORM
+	return u.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "userid"}, {Name: "ex_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"best_weight", "corresponding_reps"}),
+	}).Create(&best).Error
+}
+func (u MyModel) QueryUserBest(UserId uint, Ex_Id uint) (bestweight float64, reps float64, err error) {
+	var bestData UserBests
+	res := u.db.Where("userid = ? AND ex_id = ?", UserId, Ex_Id).First(&bestData)
+	if res.Error != nil {
+		fmt.Println("Error fetching user's best:", res.Error)
+		return 0., 0., res.Error
+	}
+	return bestData.BestWeight, bestData.CorrespondingReps, nil
+}
 
 func (u MyModel) InsertSession(Id uint, Token string, expiry time.Time) error {
 	session := Sessions{
@@ -93,6 +109,77 @@ func (u MyModel) InsertWorkout(UserID uint, workouts []ExerciseData) ([]uint, er
 		insertWorkoutIDs = append(insertWorkoutIDs, workout.WorkoutEntryID)
 	}
 	return insertWorkoutIDs, nil
+}
+func (u MyModel) UpdateMeasurements(userID uint, measurements Measurements) error {
+	// Create a struct for the updated measurements
+	updateFields := map[string]interface{}{}
+
+	// Only update the fields that are non-zero (i.e., provided by the user)
+	if measurements.Weight != nil {
+		updateFields["weight"] = measurements.Weight
+	}
+	if measurements.Neck != nil {
+		updateFields["neck"] = measurements.Neck
+	}
+	if measurements.Shoulders != nil {
+		updateFields["shoulders"] = measurements.Shoulders
+	}
+	if measurements.Chest != nil {
+		updateFields["chest"] = measurements.Chest
+	}
+	if measurements.LeftBicep != nil {
+		updateFields["left_bicep"] = measurements.LeftBicep
+	}
+	if measurements.RightBicep != nil {
+		updateFields["right_bicep"] = measurements.RightBicep
+	}
+	if measurements.UpperAbs != nil {
+		updateFields["upper_abs"] = measurements.UpperAbs
+	}
+	if measurements.LowerAbs != nil {
+		updateFields["lower_abs"] = measurements.LowerAbs
+	}
+	if measurements.Waist != nil {
+		updateFields["waist"] = measurements.Waist
+	}
+	if measurements.Hips != nil {
+		updateFields["hips"] = measurements.Hips
+	}
+	if measurements.LeftThigh != nil {
+		updateFields["left_thigh"] = measurements.LeftThigh
+	}
+	if measurements.RightThigh != nil {
+		updateFields["right_thigh"] = measurements.RightThigh
+	}
+	if measurements.LeftCalf != nil {
+		updateFields["left_calf"] = measurements.LeftCalf
+	}
+	if measurements.RightCalf != nil {
+		updateFields["right_calf"] = measurements.RightCalf
+	}
+
+	// Perform the update on the measurements table
+	result := u.db.Model(&Measurements{}).Where("userid = ?", userID).Updates(updateFields)
+	return result.Error
+}
+
+// GetMeasurements fetches the measurements for a given user
+func (u MyModel) GetMeasurements(userID uint) (Measurements, error) {
+	var measurements Measurements
+
+	// Query the measurements table for the user's data
+	result := u.db.Where("userid = ?", userID).First(&measurements)
+
+	// If no record found, return empty Measurements struct
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return Measurements{}, nil // Return an empty struct if not found
+		}
+		return Measurements{}, result.Error
+	}
+
+	// Return the found measurements
+	return measurements, nil
 }
 
 func (u MyModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error {

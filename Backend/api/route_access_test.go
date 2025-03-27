@@ -17,8 +17,14 @@ func TestSignupHandler(t *testing.T) {
 
 	// Expect Query to be called before Insert
 	mockUserModel.On("Query", "test@email.com").Return(nil, errors.New("user not found")) // Simulate "User Not Found"
-	//Expect insert to be called with these parameters and return nil if successful
+
+	// Expect insert to be called with these parameters and return nil if successful
 	mockUserModel.On("Insert", "Vivek", "Aher", "test@email.com", mock.Anything).Return(nil)
+
+	// Expect InsertBlankMeasurements to be called to create blank measurements for the user
+	mockUserModel.On("InsertBlankMeasurements", mock.Anything).Return(nil)
+
+	mockUserModel.On("GetUserIDByEmail", "test@email.com").Return(uint(1), nil)
 
 	// Create an instance of internal.Models, replacing userModel with mock
 	mockModels := database.Models{
@@ -33,7 +39,7 @@ func TestSignupHandler(t *testing.T) {
 		"password":  "securepassword",
 	}
 
-	//converting request body to JSON
+	// Converting request body to JSON
 	body, err := json.Marshal(reqBody)
 	if err != nil {
 		t.Error("Failed to marshal request body")
@@ -42,9 +48,10 @@ func TestSignupHandler(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 
+	// Call signupHandler
 	app.signupHandler(rec, req)
 
-	//check response
+	// Check response
 	var response map[string]string
 	err = json.Unmarshal(rec.Body.Bytes(), &response)
 	if err != nil {
@@ -56,8 +63,8 @@ func TestSignupHandler(t *testing.T) {
 		t.Errorf("Expected response message %q, got %q", expectedMessage, response["message"])
 	}
 
+	// Ensure InsertBlankMeasurements was called (create blank measurements entry)
 	mockUserModel.AssertExpectations(t)
-
 }
 
 // Mock session struct

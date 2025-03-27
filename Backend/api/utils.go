@@ -83,7 +83,7 @@ func (app *application) sendSuccessResponse(w http.ResponseWriter, status int, p
 
 func MigrateDB(db *gorm.DB) {
 	//creating table using automigrate
-	err := db.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{}, &internal.WorkoutToUser{}, &internal.Workouts{})
+	err := db.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{}, &internal.WorkoutToUser{}, &internal.Workouts{}, &internal.UserBests{}, &internal.Measurements{})
 	if err != nil {
 		log.Fatal("Migration error:", err)
 	}

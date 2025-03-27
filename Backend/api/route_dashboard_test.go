@@ -12,14 +12,61 @@ import (
 )
 
 // Mock application with a session method
-//type MockApplication struct {
-//	application
-//	MockSession func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error)
-//}
 //
-//func (m *MockApplication) Session(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
-//	return m.MockSession(w, r)
-//}
+//	type MockApplication struct {
+//		application
+//		MockSession func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error)
+//	}
+//
+//	func (m *MockApplication) Session(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+//		return m.MockSession(w, r)
+//	}
+func TestGetAllExercisesHandler(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Sample mock data
+	exercises := []internal.Exercises{
+		{ExerciseId: 101, ExerciseName: "Bench Press", ExerciseImageURL: "https://s3.bucket/bench-press.png"},
+		{ExerciseId: 102, ExerciseName: "Deadlift", ExerciseImageURL: "https://s3.bucket/deadlift.png"},
+	}
+
+	// Expect the GetAllExercises call and return mock data
+	mockUserModel.On("GetAllExercises").Return(exercises, nil)
+
+	// Setup app
+	mockModels := internal.Models{UserModel: mockUserModel}
+	app := application{Models: mockModels}
+
+	// Create request
+	req := httptest.NewRequest("GET", "/exercises", nil)
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	app.GetAllExercisesHandler(rec, req)
+
+	// Assertions
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", rec.Code)
+	}
+
+	var response []map[string]interface{}
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	// Basic checks
+	if len(response) != 2 {
+		t.Errorf("Expected 2 exercises, got %d", len(response))
+	}
+
+	if response[0]["name"] != "Bench Press" || response[0]["url"] != "https://s3.bucket/bench-press.png" {
+		t.Errorf("Unexpected first exercise: %+v", response[0])
+	}
+
+	// Check mock expectations
+	mockUserModel.AssertExpectations(t)
+}
 
 func TestDashboardHandler(t *testing.T) {
 	mockUserModel := new(MockUserModel)
@@ -95,10 +142,17 @@ func TestAddWorkoutHandler(t *testing.T) {
 
 	// Mock session
 	mockSession := &internal.Sessions{UserID: 1}
+	exerciseID := uint(101)
 
 	// Mock workouts input
 	workoutData := []internal.ExerciseData{
-		{ExerciseId: 101, Sets: []internal.WorkoutSet{{SetNo: 1, Repetitions: 10, Weight: 50}}},
+		{
+			ExerciseId: exerciseID,
+			Sets: []internal.WorkoutSet{
+				{SetNo: 1, Repetitions: 10, Weight: 50},
+				{SetNo: 2, Repetitions: 8, Weight: 60}, // max weight
+			},
+		},
 	}
 
 	// Mock workout entry IDs returned from InsertWorkout
@@ -112,6 +166,12 @@ func TestAddWorkoutHandler(t *testing.T) {
 
 	// Mock InsertWorkoutToUser to succeed
 	mockUserModel.On("InsertWorkoutToUser", mockSession.UserID, mockWorkoutEntryIDs).Return(nil)
+
+	// Mock QueryUserBest to return a lower best so the new one is inserted
+	mockUserModel.On("QueryUserBest", mockSession.UserID, exerciseID).Return(40.0, 10.0, nil)
+
+	// Mock UpsertUserBest to succeed
+	mockUserModel.On("UpsertUserBest", mockSession.UserID, exerciseID, 60.0, 8.0).Return(nil)
 
 	// Setup Application with Mock Model
 	mockModels := internal.Models{
@@ -156,6 +216,72 @@ func TestAddWorkoutHandler(t *testing.T) {
 		t.Errorf("Expected message %q, got %q", expectedMessage, response.Message)
 	}
 
-	// Ensure mock expectations were met
+	// Ensure all mock expectations were met
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestAddHandler(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Mock session
+	mockSession := &internal.Sessions{UserID: 2}
+	mockExerciseID := uint(111)
+	mockBestWeight := 100.0
+	mockReps := 8.0
+
+	// Mock QuerySession to return valid session
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+
+	// Mock QueryUserBest to return the expected best weight and reps
+	mockUserModel.On("QueryUserBest", mockSession.UserID, mockExerciseID).Return(mockBestWeight, mockReps, nil)
+
+	// Setup mock application with mock session handler
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return mockSession, nil
+		},
+	}
+
+	// Create request with query param: ?exercise_id=111
+	req := httptest.NewRequest("GET", "/user-best?exercise_id=111", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+
+	// Create response recorder
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	mockApp.AddHandler(rec, req)
+
+	// Assert response status
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", rec.Code)
+	}
+
+	// Assert response JSON
+	var response map[string]interface{}
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	if response["user_id"] != float64(mockSession.UserID) {
+		t.Errorf("Expected user_id %v, got %v", mockSession.UserID, response["user_id"])
+	}
+	if response["exercise_id"] != float64(mockExerciseID) {
+		t.Errorf("Expected exercise_id %v, got %v", mockExerciseID, response["exercise_id"])
+	}
+	if response["best_weight"] != mockBestWeight {
+		t.Errorf("Expected best_weight %v, got %v", mockBestWeight, response["best_weight"])
+	}
+	if response["reps"] != mockReps {
+		t.Errorf("Expected reps %v, got %v", mockReps, response["reps"])
+	}
+
+	// Ensure all mock expectations were met
 	mockUserModel.AssertExpectations(t)
 }
