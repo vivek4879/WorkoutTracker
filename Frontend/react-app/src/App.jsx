@@ -9,6 +9,8 @@ import Login from "./Components/Login/Login.jsx";
 import SignUp from "./Components/SignUp/SignUp.jsx";
 import ForgotPass from "./Components/ForgotPass/ForgotPass.jsx";
 import Dashboard from "./Components/Dashboard/Dashboard.jsx";
+import Profile from "./Components/UserProfile/Profile.jsx";
+//  import Test from "./Components/test/test.jsx";
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/test" element={<Test />} /> */}
           {/* Redirect the root path to the login page */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           {/* Fallback route */}
