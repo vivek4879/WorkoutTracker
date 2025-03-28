@@ -15,8 +15,8 @@ const Dashboard = () => {
           <a className="active" href="#">
             Home
           </a>
-          <a href="#">Add Workout</a>
-          <a href="/login" style={{ float: "right" }}>
+          <a href="/addexercise">Add Workout</a>
+          <a href="/profile" style={{ float: "right" }}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="23px"
@@ -30,13 +30,9 @@ const Dashboard = () => {
           <a href="/login" style={{ float: "right" }}>
             Logout
           </a>
-          <Link style={{ float: "right" }} to="/profile">
-            Profile
-          </Link>
           <Link style={{ float: "right" }} to="/usergoals">
             UserGoal
           </Link>
-          
         </div>
         <div className="Logo">
           <h1 className="Page-Heading">Gambare!</h1>

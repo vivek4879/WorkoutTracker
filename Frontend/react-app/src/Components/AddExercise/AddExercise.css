@@ -1,0 +1,12 @@
+.addContainer {
+  display: flex;
+  justify-content: center;
+  color: black;
+}
+.selectExercise {
+  max-width: 576px;
+  background-color: white;
+}
+.workouts {
+  padding: 10px;
+}
