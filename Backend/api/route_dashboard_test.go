@@ -1,6 +1,7 @@
 package main
 
 import (
+	internal "WorkoutTracker/internal/database"
 	"bytes"
 	"encoding/json"
 	"github.com/stretchr/testify/mock"
@@ -8,8 +9,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	internal "WorkoutTracker/internal/database"
 )
 
 // Mock application with a session method
@@ -224,7 +223,7 @@ func TestAddWorkoutHandler(t *testing.T) {
 	}
 
 	// Parse the response JSON.
-	var respBody map[string]string
+	var respBody map[string]interface{}
 	if err := json.Unmarshal(rec.Body.Bytes(), &respBody); err != nil {
 		t.Fatalf("Failed to parse response JSON: %v\nResponse: %s", err, rec.Body.String())
 	}
