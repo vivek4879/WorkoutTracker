@@ -24,6 +24,8 @@ type UserModelInterface interface {
 	UpdateMeasurements(userID uint, measurements Measurements) error
 	InsertBlankMeasurements(userID uint) error
 	GetUserIDByEmail(email string) (uint, error)
+	FetchStreakData(userID uint) (*Streak, error)
+	UpsertStreak(streakData *Streak) error
 }
 
 // Ensure MyModel implements UserModelInterface
@@ -48,7 +50,15 @@ type Sessions struct {
 	UserID uint      `gorm:"column:userid;primaryKey;not null"`
 	Token  string    `gorm:"unique;not null"`
 	Expiry time.Time `gorm:"not null"`
-	User   Users     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	User   Users     `gorm:"foreignKey:UserID;reference:ID;constraint:OnDelete:CASCADE"`
+}
+
+type Streak struct {
+	UserID          uint      `gorm:"column:userid;primaryKey;not null"`
+	LastWorkoutDate time.Time `gorm:"not null"`
+	CurrentStreak   float64   `gorm:"not null"`
+	MaxStreak       float64   `gorm:"not null"`
+	User            Users     `gorm:"foreignKey:UserID;reference:ID;constraint:OnDelete:CASCADE"`
 }
 
 type Users struct {

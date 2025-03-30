@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -184,6 +185,26 @@ func (u MyModel) GetMeasurements(userID uint) (Measurements, error) {
 
 	// Return the found measurements without the User data
 	return measurements, nil
+}
+
+func (u MyModel) FetchStreakData(userID uint) (*Streak, error) {
+	var streakData Streak
+	res := u.db.Table("streaks").Where("userid = ?", userID).First(&streakData)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		// No streak data yet, we will return a blank streak(first time user)
+		return nil, nil
+	}
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return &streakData, nil
+}
+
+func (u MyModel) UpsertStreak(streakData *Streak) error {
+	return u.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "userid"}},
+		DoUpdates: clause.AssignmentColumns([]string{"last_workout_date", "current_streak", "max_streak"}),
+	}).Create(streakData).Error
 }
 
 func (u MyModel) InsertWorkoutToUser(userID uint, workoutEntryIDs []uint) error {
