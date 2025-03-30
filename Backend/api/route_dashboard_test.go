@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/stretchr/testify/mock"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -138,85 +139,107 @@ func TestDashboardHandler(t *testing.T) {
 
 // TestAddWorkoutHandler tests adding a workout
 func TestAddWorkoutHandler(t *testing.T) {
+	const userID uint = 1
+
+	// Create a new mock UserModel.
 	mockUserModel := new(MockUserModel)
 
-	// Mock session
-	mockSession := &internal.Sessions{UserID: 1}
+	// Prepare a mock session with UserID = 1.
+	mockSession := &internal.Sessions{UserID: userID}
 	exerciseID := uint(101)
 
-	// Mock workouts input
+	// Prepare workout input data.
 	workoutData := []internal.ExerciseData{
 		{
 			ExerciseId: exerciseID,
 			Sets: []internal.WorkoutSet{
 				{SetNo: 1, Repetitions: 10, Weight: 50},
-				{SetNo: 2, Repetitions: 8, Weight: 60}, // max weight
+				{SetNo: 2, Repetitions: 8, Weight: 60}, // maximum weight set
 			},
 		},
 	}
 
-	// Mock workout entry IDs returned from InsertWorkout
+	// Prepare workout entry IDs returned from InsertWorkout.
 	mockWorkoutEntryIDs := []uint{201, 202}
 
-	// Mock QuerySession to return a valid session
-	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+	// Set up expectations for each method call that will occur in the handler:
+	mockUserModel.
+		On("QuerySession", "mock-session-token").
+		Return(mockSession, nil)
+	mockUserModel.
+		On("InsertWorkout", userID, workoutData).
+		Return(mockWorkoutEntryIDs, nil)
+	mockUserModel.
+		On("InsertWorkoutToUser", userID, mockWorkoutEntryIDs).
+		Return(nil)
+	mockUserModel.
+		On("QueryUserBest", userID, exerciseID).
+		Return(40.0, 10.0, nil)
+	mockUserModel.
+		On("UpsertUserBest", userID, exerciseID, 60.0, 8.0).
+		Return(nil)
 
-	// Mock InsertWorkout to return workout IDs
-	mockUserModel.On("InsertWorkout", mockSession.UserID, workoutData).Return(mockWorkoutEntryIDs, nil)
+	// For streak updates, assume that no streak exists yet.
+	// The UpdateWorkoutStreak method is expected to:
+	// 1. Call FetchStreakData(userID) → returns nil, nil.
+	// 2. Then call UpsertStreak(newStreak) to create a new streak record.
+	mockUserModel.
+		On("FetchStreakData", userID).
+		Return(nil, nil)
+	mockUserModel.
+		On("UpsertStreak", mock.AnythingOfType("*database.Streak")).
+		Return(nil)
+	// No expectation for UpdateWorkoutStreak because the implementation
+	// calls UpsertStreak when no streak exists.
 
-	// Mock InsertWorkoutToUser to succeed
-	mockUserModel.On("InsertWorkoutToUser", mockSession.UserID, mockWorkoutEntryIDs).Return(nil)
-
-	// Mock QueryUserBest to return a lower best so the new one is inserted
-	mockUserModel.On("QueryUserBest", mockSession.UserID, exerciseID).Return(40.0, 10.0, nil)
-
-	// Mock UpsertUserBest to succeed
-	mockUserModel.On("UpsertUserBest", mockSession.UserID, exerciseID, 60.0, 8.0).Return(nil)
-
-	// Setup Application with Mock Model
+	// Set up the Application with the mocked model.
 	mockModels := internal.Models{
 		UserModel: mockUserModel,
 	}
 	app := application{Models: mockModels}
 
-	// Create JSON request body
+	// Create the JSON request body.
 	reqBody := map[string]interface{}{
 		"workouts": workoutData,
 	}
-	body, _ := json.Marshal(reqBody)
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("Failed to marshal request body: %v", err)
+	}
 
-	// Create HTTP request
+	// Create an HTTP POST request with the JSON body and the session cookie.
 	req := httptest.NewRequest("POST", "/add-workout", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
 
-	// Create Response Recorder
+	// Create a ResponseRecorder to capture the response.
 	rec := httptest.NewRecorder()
 
-	// Call the handler
+	// Call the handler.
 	app.AddWorkoutHandler(rec, req)
 
-	// Assertions
+	// Validate the HTTP status code.
 	if rec.Code != http.StatusCreated {
 		t.Errorf("Expected status 201, got %d", rec.Code)
 	}
 
-	type Response struct {
-		Message string `json:"message"`
+	// Parse the response JSON.
+	var respBody map[string]string
+	if err := json.Unmarshal(rec.Body.Bytes(), &respBody); err != nil {
+		t.Fatalf("Failed to parse response JSON: %v\nResponse: %s", err, rec.Body.String())
 	}
 
-	var response Response
-	err := json.Unmarshal(rec.Body.Bytes(), &response)
-	if err != nil {
-		t.Fatalf("Failed to parse response JSON: %v\nResponse Body: %s", err, rec.Body.String())
-	}
-
+	// Check that the response message is as expected.
 	expectedMessage := "Workout added successfully"
-	if response.Message != expectedMessage {
-		t.Errorf("Expected message %q, got %q", expectedMessage, response.Message)
+	if respBody["message"] != expectedMessage {
+		t.Errorf("Expected message %q, got %q", expectedMessage, respBody["message"])
 	}
 
-	// Ensure all mock expectations were met
+	// Assert that FetchStreakData and UpsertStreak were called.
+	mockUserModel.AssertCalled(t, "FetchStreakData", userID)
+	mockUserModel.AssertCalled(t, "UpsertStreak", mock.AnythingOfType("*database.Streak"))
+
+	// Verify that all expectations were met.
 	mockUserModel.AssertExpectations(t)
 }
 

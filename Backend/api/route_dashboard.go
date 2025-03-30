@@ -143,12 +143,16 @@ func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request
 		}
 
 	}
-
+	err2 := app.UpdateWorkoutStreak(sess.UserID)
+	if err2 != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
 	response := map[string]string{"message": "Workout added successfully"}
 	app.sendSuccessResponse(w, http.StatusCreated, response)
 }
 
-// AddHandler Handler to return users best in that particular exerciseId.
+// AddHandler Handler to return user's best in that particular exerciseId.
 func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 	// Validate Session
 	sess, err := app.Session(w, r)
