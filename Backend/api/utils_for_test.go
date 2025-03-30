@@ -11,6 +11,18 @@ type MockUserModel struct {
 	mock.Mock
 }
 
+func (m *MockUserModel) FetchStreakData(userID uint) (*database.Streak, error) {
+	args := m.Called(userID)
+	if streak, ok := args.Get(0).(*database.Streak); ok {
+		return streak, args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+func (m *MockUserModel) UpsertStreak(streakData *database.Streak) error {
+	args := m.Called(streakData)
+	return args.Error(0)
+}
+
 func (m *MockUserModel) GetUserIDByEmail(email string) (uint, error) {
 	args := m.Called(email)
 	return args.Get(0).(uint), args.Error(1)
