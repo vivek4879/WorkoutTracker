@@ -163,22 +163,26 @@ func (u MyModel) UpdateMeasurements(userID uint, measurements Measurements) erro
 	return result.Error
 }
 
-// GetMeasurements fetches the measurements for a given user
+// GetMeasurements retrieves the measurements for a given user.
 func (u MyModel) GetMeasurements(userID uint) (Measurements, error) {
 	var measurements Measurements
 
-	// Query the measurements table for the user's data
+	// Query the measurements table for the user's data without preloading the User field
 	result := u.db.Where("userid = ?", userID).First(&measurements)
 
-	// If no record found, return empty Measurements struct
+	// If no record found, return a blank measurements struct
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return Measurements{}, nil // Return an empty struct if not found
+			// No need to insert default measurements, just return an empty struct
+			return Measurements{
+				Userid: userID,
+				// Fields are already nil, so no need to set them explicitly
+			}, nil
 		}
 		return Measurements{}, result.Error
 	}
 
-	// Return the found measurements
+	// Return the found measurements without the User data
 	return measurements, nil
 }
 
@@ -218,6 +222,38 @@ func (u MyModel) Insert(FirstName string, LastName string, Email string, Passwor
 		return res.Error
 	}
 	return nil
+}
+func (u MyModel) GetUserIDByEmail(email string) (uint, error) {
+	var user Users
+	err := u.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return 0, err
+	}
+	return user.ID, nil
+}
+
+func (u MyModel) InsertBlankMeasurements(userID uint) error {
+	// Insert a record into the measurements table with all fields set to blank (nil or zero values)
+	measurements := Measurements{
+		Userid:     userID,
+		Weight:     nil,
+		Neck:       nil,
+		Shoulders:  nil,
+		Chest:      nil,
+		LeftBicep:  nil,
+		RightBicep: nil,
+		UpperAbs:   nil,
+		LowerAbs:   nil,
+		Waist:      nil,
+		Hips:       nil,
+		LeftThigh:  nil,
+		RightThigh: nil,
+		LeftCalf:   nil,
+		RightCalf:  nil,
+	}
+
+	// Insert the empty measurements record into the database
+	return u.db.Create(&measurements).Error
 }
 
 func (u MyModel) Query(Email string) (*Users, error) {
