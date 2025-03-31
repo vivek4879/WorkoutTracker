@@ -12,7 +12,8 @@ import Dashboard from "./Components/Dashboard/Dashboard.jsx";
 import Profile from "./Components/UserProfile/Profile.jsx";
 import UserGoals from "./Components/UserGoals/usergoals.jsx";
 
-//  import Test from "./Components/test/test.jsx";
+import MeasurementsForm from "./Components/Measurements/MeasurementsForm.jsx";
+import MeasurementsDisplay from "./Components/Measurements/MeasurementsDisplay.jsx";
 
 function App() {
   return (
@@ -24,14 +25,15 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/usergoals" element={<UserGoals/>} />
+          <Route path="/usergoals" element={<UserGoals />} />
+      
+          <Route path="/measurements" element={<MeasurementsForm />} />
+          <Route path="/measurements/view" element={<MeasurementsDisplay />} />
 
-          {/* <Route path="/test" element={<Test />} /> */}
-          {/* Redirect the root path to the login page */}
           <Route path="/" element={<Navigate to="/login" replace />} />
+
           {/* Fallback route */}
           <Route path="*" element={<Login />} />
-          
         </Routes>
       </Router>
     </div>

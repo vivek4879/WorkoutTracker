@@ -33,10 +33,14 @@ const Dashboard = () => {
           <Link style={{ float: "right" }} to="/profile">
             Profile
           </Link>
+         <Link style={{ float: "right" }} to="/measurements">
+  Measurements
+</Link>
+
           <Link style={{ float: "right" }} to="/usergoals">
             UserGoal
           </Link>
-          
+
         </div>
         <div className="Logo">
           <h1 className="Page-Heading">Gambare!</h1>
