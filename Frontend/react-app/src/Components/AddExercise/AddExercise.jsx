@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import axios from "axios"; // API call commented out
 import "./AddExercise.css";
 const AddExercise = () => {
@@ -74,7 +74,7 @@ const AddExercise = () => {
   return (
     <div className="container">
       <div className="topnav">
-        <a href="#">Home</a>
+        <a href="/dashboard">Home</a>
         <a className="active" href="#">
           Add Workout
         </a>
@@ -149,7 +149,12 @@ const AddExercise = () => {
               )}
             </div>
           ))}
-          <button className="addButton" type="submit">
+          <button
+            className="addButton"
+            type="submit"
+            href="/dashboard"
+            // onClick={handleAddWorkout}
+          >
             Add Workout
           </button>
         </div>
