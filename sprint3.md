@@ -2,9 +2,93 @@
 
 ### 1. Frontend
 
+In this sprint, several key features were added or enhanced in the frontend to improve the user experience and provide better tracking and management of workout data, personal bests, and user profile information. Below are the detailed updates made to the frontend:
+
+---
+
+## 1. **Dashboard Page Updates**
+
+The dashboard page has been enhanced to render user-specific data, including detailed workout streak information. The streak now accurately tracks the number of consecutive workouts logged by the user, encouraging consistent workout behavior. This update ensures the user receives real-time feedback on their performance and workout consistency.
+
+### **Key Functionality:**
+
+- Displays the current workout streak, showing the number of consecutive days the user has worked out.
+- Fetches streak data from the backend via the updated API (`getUserStreak`) and dynamically updates it on the dashboard.
+- Ensures that the page renders correctly, providing a smooth and informative user experience.
+
+### **Impact:**
+
+- Enhances user motivation by displaying their workout streaks and personal bests directly on the dashboard.
+- Provides a clear, actionable view of the user’s workout consistency and progress.
+
+---
+
+## 2. **User Profile Page**
+
+A new user profile page was added to allow users to view and edit their profile information, including details such as name, email, and other personal details. This page provides users with a seamless way to manage their personal data.
+
+### **Key Functionality:**
+
+- Displays user profile information fetched from the backend.
+- Allows users to edit and update their profile data.
+- Ensures the user’s changes are saved and reflected both in the UI and in the backend.
+
+### **Impact:**
+
+- Provides a user-friendly interface for managing profile information.
+- Increases user engagement by allowing them to personalize their profile.
+
+---
+
+## 3. **Measurements Component**
+
+A new measurements component was created to allow users to record and update their body measurements, such as height, weight, chest, waist, and biceps. This feature enables users to track their fitness progress over time by keeping an accurate record of their body measurements.
+
+### **Key Functionality:**
+
+- Users can input or update their body measurements (e.g., height, weight, chest, waist, and biceps) via an intuitive form.
+- The measurements are sent to the backend to be stored and associated with the user’s account.
+- Supports validation to ensure correct data format is entered.
+
+### **Impact:**
+
+- Enables users to track their body progress and see how their workout efforts are affecting their physical measurements.
+- Adds value to the platform by providing a complete fitness tracking experience.
+
+---
+
+## 4. **Add Workout Page**
+
+The add workout page has been developed to allow users to log their workouts, track personal bests, and update their streaks. This page now includes functionality for users to add multiple sets per workout, improving flexibility and tracking accuracy.
+
+### **Key Functionality:**
+
+- Users can log multiple sets per workout by adding additional rows for each set.
+- For each set, users can input the weight lifted and the number of reps, enabling detailed tracking of each workout.
+- The page tracks and updates the user’s personal bests for each exercise. If a new performance surpasses the previous best, it is recorded as the new personal best.
+- The workout streak is also updated based on the new workout data (i.e., the number of consecutive workouts).
+
+### **Impact:**
+
+- Provides a more granular level of tracking for each workout, allowing users to log multiple sets with different weights and reps.
+- Enhances motivation by updating the streak and personal bests after each workout.
+- Allows users to track their progress on a set-by-set basis, encouraging improvement.
+
+---
+
+## Summary of Frontend Changes in This Sprint:
+
+- **Dashboard Enhancements:** Updated the dashboard to show workout streak information, providing users with motivation and insight into their workout consistency.
+- **User Profile Page:** Created a user profile page for managing and updating personal information, allowing users to personalize their accounts.
+- **Measurements Component:** Introduced a component for recording and tracking body measurements, enabling users to track physical progress alongside workout performance.
+- **Add Workout Page:** Enhanced the add workout page to allow users to log multiple sets per workout and track their personal bests and streaks effectively.
+
+These updates significantly improve the user experience by providing features that allow for better tracking, personalization, and progress monitoring, enhancing the overall fitness journey for users.
+
 ### 2. Backend
+
 In this sprint, several important APIs were added to enhance user interaction with the application. The new APIs focus on measurements,user performance tracking, and exercise management. Additionally, significant updates were made to the Add Workout API to track personal bests and update workout streaks.
-    
+
 <b>2.1. Update Measurements:</b> This API was introduced to allow users to update their body measurements, which include data like height, weight, and other fitness-related metrics.The user can send a JSON object containing updated body measurements, such as height, weight, chest, waist, and biceps.The API ensures that the user is authenticated by validating the session token before updating their measurements in the database. Upon successful update, a success message is returned. If the session is invalid or the data is malformed, appropriate error responses are sent.
 
 <b>Key Functionality:</b>
@@ -19,79 +103,76 @@ In this sprint, several important APIs were added to enhance user interaction wi
 
 - Description:
 
-    - Response: The API fetches and returns the stored measurements for the authenticated user in JSON format.
+  - Response: The API fetches and returns the stored measurements for the authenticated user in JSON format.
 
-    - Process: The API checks the session token to ensure the user is authenticated before retrieving the measurements from the database.
-
+  - Process: The API checks the session token to ensure the user is authenticated before retrieving the measurements from the database.
 
 - Key Functionality:
 
-    - Fetches stored measurements for the authenticated user.
+  - Fetches stored measurements for the authenticated user.
 
-    - Ensures that only logged-in users can retrieve their measurements.
+  - Ensures that only logged-in users can retrieve their measurements.
 
-    - Provides a structured response with height, weight, and other key measurements.
+  - Provides a structured response with height, weight, and other key measurements.
 
 <b>2.3. Get User Best for Exercise :</b> This API allows users to track their best performance for a particular exercise.
 
 - Description:
 
-    - Query Parameter: Users specify the exercise_id in the query parameters.
+  - Query Parameter: Users specify the exercise_id in the query parameters.
 
-    - Response: The user’s personal best for the given exercise, including the highest weight lifted and the corresponding repetitions, is returned.
-    - Process: The API checks the session and fetches the user's best performance for the specified exercise from the database.
+  - Response: The user’s personal best for the given exercise, including the highest weight lifted and the corresponding repetitions, is returned.
+  - Process: The API checks the session and fetches the user's best performance for the specified exercise from the database.
 
-    
 - Key Functionality:
 
-    - Retrieves the user’s best performance for a specific exercise.
+  - Retrieves the user’s best performance for a specific exercise.
 
-    - Ensures that the user is authenticated before fetching the data.
+  - Ensures that the user is authenticated before fetching the data.
 
-    - Provides the best weight and corresponding repetitions for the specified exercise.
+  - Provides the best weight and corresponding repetitions for the specified exercise.
 
 <b>2.4. Get All Exercises :</b> This API provides a list of all available exercises in the system, enabling users to explore exercises they can log in their workout sessions.
 
 - Description:
 
-    - Response: A list of exercises with details like exercise_id, name, and URL (image or link related to the exercise).
+  - Response: A list of exercises with details like exercise_id, name, and URL (image or link related to the exercise).
 
-    - Process: This API does not require session validation and returns a public list of exercises available in the system.
-
+  - Process: This API does not require session validation and returns a public list of exercises available in the system.
 
 - Key Functionality:
 
-    - Lists all available exercises in the system.
+  - Lists all available exercises in the system.
 
-    - Provides exercise details such as name and image URL.
+  - Provides exercise details such as name and image URL.
 
-    - Helps users discover exercises to log in their workout sessions.
+  - Helps users discover exercises to log in their workout sessions.
 
 <b>2.5. Changes Made to the Add Workout API: </b>The Add Workout API was updated to not only add a workout for the user but also to track personal bests and update workout streaks.
 
 - Description:
 
-    - Request Body: Users provide workout details, including exerciseid, sets (with repetitions and weights), and the timestamp for when the workout was performed.
+  - Request Body: Users provide workout details, including exerciseid, sets (with repetitions and weights), and the timestamp for when the workout was performed.
 
-    - Process: The API follows these steps:
-      - Session Validation: The session token is checked to ensure the user is authenticated.
-      - Adding the Workout: The workout data is inserted into the database for the authenticated user.
-      - Updating Best Performance: For each exercise in the workout, the API checks if the user’s current performance surpasses their personal best. If so, the new performance is recorded as their new best.
-      - Updating Streaks: The API tracks the user's streak, i.e., the number of consecutive workouts logged. If the user continues to log workouts without breaks, their streak is updated accordingly.
+  - Process: The API follows these steps:
+    - Session Validation: The session token is checked to ensure the user is authenticated.
+    - Adding the Workout: The workout data is inserted into the database for the authenticated user.
+    - Updating Best Performance: For each exercise in the workout, the API checks if the user’s current performance surpasses their personal best. If so, the new performance is recorded as their new best.
+    - Updating Streaks: The API tracks the user's streak, i.e., the number of consecutive workouts logged. If the user continues to log workouts without breaks, their streak is updated accordingly.
 
 - Response:
 
-    - On success, the API returns a message confirming the workout was added, along with any updates to the user's best performance and streak.
+  - On success, the API returns a message confirming the workout was added, along with any updates to the user's best performance and streak.
 
-    - If any error occurs (such as invalid session or workout data), an error message is returned.
+  - If any error occurs (such as invalid session or workout data), an error message is returned.
 
 - Key Updates:
 
-    - Tracking Personal Bests: For each exercise logged, the API checks whether the new performance (maximum weight lifted) exceeds the user's previous best. If it does, the personal best is updated.
+  - Tracking Personal Bests: For each exercise logged, the API checks whether the new performance (maximum weight lifted) exceeds the user's previous best. If it does, the personal best is updated.
 
-    - Streak Updates: The API also tracks the user's workout streak, encouraging consistent workout behavior. If a user logs workouts consecutively, their streak is updated.
+  - Streak Updates: The API also tracks the user's workout streak, encouraging consistent workout behavior. If a user logs workouts consecutively, their streak is updated.
 
-    - Detailed Response: The response includes information about updated personal bests and the streak (old and new streak).
+  - Detailed Response: The response includes information about updated personal bests and the streak (old and new streak).
 
 ### Summary of Changes in This Sprint:
 
@@ -104,11 +185,11 @@ In this sprint, several important APIs were added to enhance user interaction wi
 - Workout Tracking Enhancements: The add-workout API was enhanced to track personal bests and update the user's streak based on consecutive workout logs.
 
 These improvements add more value to the platform by making it easier for users to track their progress, keep motivated through streaks, and enhance their workout experience.
+
 ## Unit Tests for FrontEnd
 
-
-
 ## Unit tests for backend
+
 #### 1. Access Tests (in route_access_test.go)
 
     1.1. TestSignupHandler: Ensures user signup works correctly.
@@ -161,7 +242,6 @@ These improvements add more value to the platform by making it easier for users 
 
 `500 Internal Server Error` for other failures.
 
-
 ### <b>2. User Authentication</b>
 
 <b>Endpoint</b>: POST /authenticate
@@ -193,7 +273,6 @@ These improvements add more value to the platform by making it easier for users 
 
 `401 Unauthorized` on incorrect credentials.
 
-
 ### <b>3. User Logout</b>
 
 <b>Endpoint</b>: POST /logout
@@ -213,7 +292,6 @@ These improvements add more value to the platform by making it easier for users 
 `200 OK` on success.
 
 `500 Internal Server Error` if session deletion fails.
-
 
 ### <b>4. Dashboard</b>
 
@@ -236,7 +314,6 @@ These improvements add more value to the platform by making it easier for users 
 `401 Unauthorized` if session is invalid.
 
 ### <b>5. Add Workout</b>
-
 
 <b>Endpoint</b>: POST /add-workout
 
@@ -316,8 +393,6 @@ These improvements add more value to the platform by making it easier for users 
 `401 Unauthorized` if deletion fails.
 `401 Unauthorized` if session deletion fails.
 
-
-
 ### <b>7. Update Measurements</b>
 
 **Endpoint**: `PUT /update-measurements`
@@ -332,7 +407,6 @@ These improvements add more value to the platform by making it easier for users 
   "neck": 38.0,
   "chest": 100.0
 }
-
 ```
 
 **Response**:
@@ -351,12 +425,11 @@ These improvements add more value to the platform by making it easier for users 
 `400 Badrequest` if JSON invalid.
 `500 InternalServerError` if update fails.
 
-
-### <b>8.  Measurements</b>
+### <b>8. Measurements</b>
 
 **Endpoint**: `GET /measurements`
 
-**Description**: Returns the user's measurements if available. Returns null values if fields are blank. 
+**Description**: Returns the user's measurements if available. Returns null values if fields are blank.
 
 **Response**:
 
@@ -382,8 +455,7 @@ These improvements add more value to the platform by making it easier for users 
 `401 Unauthorized` if session is invalid or expired.
 `500 InternalServerError` if retrieval fails.
 
-
-### <b>9.  user-bests</b>
+### <b>9. user-bests</b>
 
 **Endpoint**: `GET /user-bests`
 
@@ -409,7 +481,6 @@ These improvements add more value to the platform by making it easier for users 
 `200 OK` on success.
 `401 Unauthorized` if session is invalid or expired.
 `500 InternalServerError` if retrieval fails.
-
 
 ### <b>10. Exercises</b>
 
