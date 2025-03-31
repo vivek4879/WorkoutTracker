@@ -1,11 +1,64 @@
+import { useEffect, useState } from "react";
+// import axios from "axios";  // Commenting out axios import
 import "./AddExercise.css";
-import { useEffect } from "react";
-
 const AddExercise = () => {
   useEffect(() => {
     document.title = "Add Exercise";
   }, []);
-  const items = [["Ab Wheel"], ["Aerobics"], ["Around the World`"]];
+
+  // State to track which items are expanded and the personal best for each workout
+  const [expandedItems, setExpandedItems] = useState({});
+  const [personalBests, setPersonalBests] = useState({});
+
+  // Personal bests array (as a constant for now)
+  const personalBestData = {
+    1: "150 lbs", // Ab Wheel
+    2: "30 minutes", // Aerobics
+    3: "75 lbs", // Arnold Press (Dumbbell)
+    4: "10 rounds", // Around the World
+    5: "100 lbs", // Back Extension
+    6: "150 lbs", // Back Extensions (Machine)
+    7: "50 reps", // Ball Slams
+    // 8: "60 seconds", // Battle Ropes
+  };
+
+  // Toggle the expanded state for a specific item
+  const toggleExpand = (index, workoutId) => {
+    setExpandedItems((prev) => ({ ...prev, [index]: !prev[index] }));
+
+    // Only fetch the personal best if expanding the workout
+    if (!personalBests[workoutId]) {
+      // API call is commented out for now
+      // axios.get(`/api/getPersonalBest/${workoutId}`)
+      //   .then(response => {
+      //     setPersonalBests((prev) => ({
+      //       ...prev,
+      //       [workoutId]: response.data.personalBest,
+      //     }));
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error fetching personal best:", error);
+      //   });
+
+      // Use the constant array data to set the personal best
+      setPersonalBests((prev) => ({
+        ...prev,
+        [workoutId]: personalBestData[workoutId] || "-",
+      }));
+    }
+  };
+
+  const items = [
+    [1, "Ab Wheel"],
+    [2, "Aerobics"],
+    [3, "Arnold Press (Dumbbell)"],
+    [4, "Around the World"],
+    [5, "Back Extension"],
+    [6, "Back Extensions (Machine)"],
+    [7, "Ball Slams"],
+    [8, "Battle Ropes"],
+  ];
+
   return (
     <div className="container">
       <div className="topnav">
@@ -34,13 +87,26 @@ const AddExercise = () => {
       <div className="addContainer">
         <div className="selectExercise">
           <h2>Exercise List</h2>
-          <ul>
-            {items.map((item, index) => (
-              <div className="workouts" key={index}>
-                {item[0]}
+          {items.map((item, index) => (
+            <div key={index}>
+              <div
+                className="workouts"
+                onClick={() => toggleExpand(index, item[0])}
+                style={{ cursor: "pointer" }}
+              >
+                {item[1]}
               </div>
-            ))}
-          </ul>
+              {expandedItems[index] && (
+                <div className="expandedOptions">
+                  <p>Personal Best: {personalBests[item[0]] || "Loading..."}</p>
+                  {/* Add more options like "Edit", "Delete", etc. here */}
+                  <p>Option 1: Details</p>
+                  <p>Option 2: Edit</p>
+                  <p>Option 3: Delete</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
