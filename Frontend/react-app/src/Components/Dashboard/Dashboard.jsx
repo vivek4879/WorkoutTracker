@@ -30,9 +30,9 @@ const Dashboard = () => {
           <a href="/login" style={{ float: "right" }}>
             Logout
           </a>
-          <Link style={{ float: "right" }} to="/usergoals">
+          {/* <Link style={{ float: "right" }} to="/usergoals">
             UserGoal
-          </Link>
+          </Link> */}
         </div>
         <div className="Logo">
           <h1 className="Page-Heading">Gambare!</h1>

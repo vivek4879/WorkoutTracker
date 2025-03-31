@@ -18,5 +18,8 @@
   cursor: pointer;
 }
 
+.exeContainer {
+  padding: 20px 30px;
+}
 .expandedOptions {
 }
