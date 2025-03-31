@@ -1,0 +1,22 @@
+.addContainer {
+  display: flex;
+  justify-content: center;
+  color: black;
+}
+.selectExercise {
+  max-width: 576px;
+  background-color: white;
+}
+.workouts {
+  color: black;
+  padding: 5px;
+  text-align: center;
+}
+
+.workouts:hover {
+  background-color: rgb(121, 121, 121);
+  cursor: pointer;
+}
+
+.expandedOptions {
+}
