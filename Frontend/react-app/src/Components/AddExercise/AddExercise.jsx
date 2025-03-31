@@ -62,7 +62,7 @@ const AddExercise = () => {
   return (
     <div className="container">
       <div className="topnav">
-        <a href="#">Home</a>
+        <a href="/dashboard">Home</a>
         <a className="active" href="#">
           Add Workout
         </a>
@@ -86,7 +86,9 @@ const AddExercise = () => {
       </div>
       <div className="addContainer">
         <div className="selectExercise">
-          <h2>Exercise List</h2>
+          <div className="exeContainer">
+            <h2>Exercise List</h2>
+          </div>
           {items.map((item, index) => (
             <div key={index}>
               <div

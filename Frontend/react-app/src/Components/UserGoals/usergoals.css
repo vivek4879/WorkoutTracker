@@ -1,28 +1,3 @@
-.topnav {
-  background-color: #ffeb00;
-  width: 100%;
-}
-.topnav a {
-  float: left;
-  color: #000000;
-  text-align: center;
-  padding: 10px 16px;
-  text-decoration: none;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-/* Change the color of links on hover */
-.topnav a:hover {
-  background-color: #606060;
-  color: black;
-}
-
-/* Add a color to the active/current link */
-.topnav a.active {
-  background-color: #323232;
-  color: white;
-}
 .set-goals-container {
   max-width: 400px;
   margin: auto;
