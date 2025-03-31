@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
-// import axios from "axios";  // Commenting out axios import
+import React, { useEffect, useState } from "react";
+// import axios from "axios"; // API call commented out
 import "./AddExercise.css";
 const AddExercise = () => {
   useEffect(() => {
     document.title = "Add Exercise";
   }, []);
 
-  // State to track which items are expanded and the personal best for each workout
+  // State for expanded workouts, personal bests, and sets for each workout
   const [expandedItems, setExpandedItems] = useState({});
   const [personalBests, setPersonalBests] = useState({});
+  const [setsData, setSetsData] = useState({});
 
-  // Personal bests array (as a constant for now)
+  // Constant personal best data
   const personalBestData = {
     1: "150 lbs", // Ab Wheel
     2: "30 minutes", // Aerobics
@@ -19,33 +20,44 @@ const AddExercise = () => {
     5: "100 lbs", // Back Extension
     6: "150 lbs", // Back Extensions (Machine)
     7: "50 reps", // Ball Slams
-    // 8: "60 seconds", // Battle Ropes
+    8: "60 seconds", // Battle Ropes
   };
 
-  // Toggle the expanded state for a specific item
+  // Toggle expanded state for a workout and initialize personal best and sets if needed
   const toggleExpand = (index, workoutId) => {
     setExpandedItems((prev) => ({ ...prev, [index]: !prev[index] }));
 
-    // Only fetch the personal best if expanding the workout
     if (!personalBests[workoutId]) {
-      // API call is commented out for now
+      // Uncomment and replace the URL when integrating the API
       // axios.get(`/api/getPersonalBest/${workoutId}`)
       //   .then(response => {
-      //     setPersonalBests((prev) => ({
+      //     setPersonalBests(prev => ({
       //       ...prev,
       //       [workoutId]: response.data.personalBest,
       //     }));
       //   })
-      //   .catch((error) => {
-      //     console.error("Error fetching personal best:", error);
-      //   });
+      //   .catch((error) => console.error("Error fetching personal best:", error));
 
-      // Use the constant array data to set the personal best
+      // Use constant data for now
       setPersonalBests((prev) => ({
         ...prev,
-        [workoutId]: personalBestData[workoutId] || "-",
+        [workoutId]:
+          personalBestData[workoutId] || "No personal best available",
       }));
     }
+
+    // Initialize the sets for this workout if not already set
+    if (!setsData[workoutId]) {
+      setSetsData((prev) => ({ ...prev, [workoutId]: [{}] }));
+    }
+  };
+
+  // Add a new set row for a given workout
+  const addSet = (workoutId) => {
+    setSetsData((prev) => ({
+      ...prev,
+      [workoutId]: [...(prev[workoutId] || []), {}],
+    }));
   };
 
   const items = [
@@ -62,7 +74,7 @@ const AddExercise = () => {
   return (
     <div className="container">
       <div className="topnav">
-        <a href="/dashboard">Home</a>
+        <a href="#">Home</a>
         <a className="active" href="#">
           Add Workout
         </a>
@@ -86,9 +98,7 @@ const AddExercise = () => {
       </div>
       <div className="addContainer">
         <div className="selectExercise">
-          <div className="exeContainer">
-            <h2>Exercise List</h2>
-          </div>
+          <h2>Exercise List</h2>
           {items.map((item, index) => (
             <div key={index}>
               <div
@@ -101,14 +111,47 @@ const AddExercise = () => {
               {expandedItems[index] && (
                 <div className="expandedOptions">
                   <p>Personal Best: {personalBests[item[0]] || "Loading..."}</p>
-                  {/* Add more options like "Edit", "Delete", etc. here */}
-                  <p>Option 1: Details</p>
-                  <p>Option 2: Edit</p>
-                  <p>Option 3: Delete</p>
+                  <div className="workout-titles">
+                    <p>Set</p>
+                    <p>KG/s</p>
+                    <p>Reps</p>
+                  </div>
+                  {setsData[item[0]] &&
+                    setsData[item[0]].map((set, setIndex) => (
+                      <div className="workout" key={setIndex}>
+                        <input
+                          className="metrics"
+                          type="number"
+                          placeholder="0"
+                          min="0"
+                          max="10"
+                        />
+                        <input
+                          className="metrics"
+                          type="number"
+                          placeholder="0"
+                          min="0"
+                          max="50"
+                        />
+                        <input
+                          className="metrics"
+                          type="number"
+                          placeholder="0"
+                          min="0"
+                          max="10"
+                        />
+                      </div>
+                    ))}
+                  <button className="addset" onClick={() => addSet(item[0])}>
+                    Add Set
+                  </button>
                 </div>
               )}
             </div>
           ))}
+          <button className="addButton" type="submit">
+            Add Workout
+          </button>
         </div>
       </div>
     </div>

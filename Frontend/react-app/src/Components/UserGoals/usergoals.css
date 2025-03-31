@@ -20,13 +20,13 @@
   margin-bottom: 1rem;
 }
 
-input[type="number"] {
+/* input[type="number"] {
   width: 100%;
   padding: 0.5rem;
   margin-top: 0.3rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
+} */
 
 .checkbox-group label {
   display: block;
