@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import axios from "axios"; // API call commented out
 import "./AddExercise.css";
+
 const AddExercise = () => {
   useEffect(() => {
     document.title = "Add Exercise";
   }, []);
 
-  // State for expanded workouts, personal bests, and sets for each workout
+  // State for expanded workouts, personal bests, sets for each workout, and workout data
   const [expandedItems, setExpandedItems] = useState({});
   const [personalBests, setPersonalBests] = useState({});
   const [setsData, setSetsData] = useState({});
+  const [workoutData, setWorkoutData] = useState({}); // To store the sets, weight, and reps
 
   // Constant personal best data
   const personalBestData = {
@@ -58,6 +60,18 @@ const AddExercise = () => {
       ...prev,
       [workoutId]: [...(prev[workoutId] || []), {}],
     }));
+  };
+
+  // Handle the addition of a workout (save the sets, weight, and reps)
+  const handleAddWorkout = (workoutId) => {
+    const updatedWorkoutData = { ...workoutData };
+    updatedWorkoutData[workoutId] = setsData[workoutId].map((set) => ({
+      set: set.set || 0,
+      kg: set.kg || 0,
+      reps: set.reps || 0,
+    }));
+    setWorkoutData(updatedWorkoutData);
+    console.log("Workout data saved:", updatedWorkoutData); // For now, we log the workout data
   };
 
   const items = [
@@ -125,6 +139,17 @@ const AddExercise = () => {
                           placeholder="0"
                           min="0"
                           max="10"
+                          onChange={(e) => {
+                            const updatedSets = [...setsData[item[0]]];
+                            updatedSets[setIndex] = {
+                              ...updatedSets[setIndex],
+                              set: e.target.value,
+                            };
+                            setSetsData((prev) => ({
+                              ...prev,
+                              [item[0]]: updatedSets,
+                            }));
+                          }}
                         />
                         <input
                           className="metrics"
@@ -132,6 +157,17 @@ const AddExercise = () => {
                           placeholder="0"
                           min="0"
                           max="50"
+                          onChange={(e) => {
+                            const updatedSets = [...setsData[item[0]]];
+                            updatedSets[setIndex] = {
+                              ...updatedSets[setIndex],
+                              kg: e.target.value,
+                            };
+                            setSetsData((prev) => ({
+                              ...prev,
+                              [item[0]]: updatedSets,
+                            }));
+                          }}
                         />
                         <input
                           className="metrics"
@@ -139,19 +175,33 @@ const AddExercise = () => {
                           placeholder="0"
                           min="0"
                           max="10"
+                          onChange={(e) => {
+                            const updatedSets = [...setsData[item[0]]];
+                            updatedSets[setIndex] = {
+                              ...updatedSets[setIndex],
+                              reps: e.target.value,
+                            };
+                            setSetsData((prev) => ({
+                              ...prev,
+                              [item[0]]: updatedSets,
+                            }));
+                          }}
                         />
                       </div>
                     ))}
                   <button className="addset" onClick={() => addSet(item[0])}>
                     Add Set
                   </button>
+                  <button
+                    className="addButton"
+                    onClick={() => handleAddWorkout(item[0])}
+                  >
+                    Save Workout
+                  </button>
                 </div>
               )}
             </div>
           ))}
-          <button className="addButton" type="submit">
-            Add Workout
-          </button>
         </div>
       </div>
     </div>
