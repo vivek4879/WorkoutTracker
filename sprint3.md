@@ -1,4 +1,4 @@
-## Detail work completed in Sprint 2
+## Detail work completed in Sprint 3
 
 ### 1. Frontend
 
