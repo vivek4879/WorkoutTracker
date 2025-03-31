@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+	"time"
 )
 
 type PasswordHasher interface {
@@ -83,10 +84,47 @@ func (app *application) sendSuccessResponse(w http.ResponseWriter, status int, p
 
 func MigrateDB(db *gorm.DB) {
 	//creating table using automigrate
-	err := db.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{}, &internal.WorkoutToUser{}, &internal.Workouts{}, &internal.UserBests{}, &internal.Measurements{})
+	err := db.AutoMigrate(&internal.Users{}, &internal.Sessions{}, &internal.Exercises{}, &internal.WorkoutToUser{}, &internal.Workouts{}, &internal.UserBests{}, &internal.Measurements{}, &internal.Streak{})
 	if err != nil {
 		log.Fatal("Migration error:", err)
 	}
 	log.Println("Database migrated")
+}
 
+func (app *application) UpdateWorkoutStreak(userid uint) error {
+	today := time.Now().Truncate(24 * time.Hour)
+	streakData, err := app.Models.UserModel.FetchStreakData(userid)
+	if err != nil {
+		return fmt.Errorf("Error fetching streak data: %w", err)
+	}
+	if streakData == nil {
+		streakData = &internal.Streak{
+			UserID:          userid,
+			LastWorkoutDate: time.Now(),
+			CurrentStreak:   1,
+			MaxStreak:       1,
+		}
+	} else {
+		lastDate := streakData.LastWorkoutDate.Truncate(24 * time.Hour)
+		yesterday := today.AddDate(0, 0, -1)
+		// Only update if the last workout wasn't already today
+		if lastDate.Equal(today) {
+			return nil
+		}
+		//Update Streak based on last workout
+		if lastDate.Equal(yesterday) {
+			streakData.CurrentStreak++
+		} else {
+			streakData.CurrentStreak = 1
+		}
+	}
+	//Update Max Streak
+	if streakData.CurrentStreak > streakData.MaxStreak {
+		streakData.MaxStreak = streakData.CurrentStreak
+	}
+	err1 := app.Models.UserModel.UpsertStreak(streakData)
+	if err1 != nil {
+		return fmt.Errorf("Error updating streak: %w", err1)
+	}
+	return nil
 }

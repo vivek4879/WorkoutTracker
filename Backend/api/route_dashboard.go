@@ -112,6 +112,9 @@ func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	//create slice to track best updates
+	var bestUpdates []map[string]interface{}
+
 	// Update bests for each exercise
 	for _, workout := range input.Workouts {
 		maxWeight := int64(0)
@@ -140,15 +143,35 @@ func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request
 				app.sendErrorResponse(w, http.StatusInternalServerError, "Failed to update user's best performance")
 				return
 			}
+			bestUpdates = append(bestUpdates, map[string]interface{}{
+				"exercise_id":     workout.ExerciseId,
+				"old_best_weight": currentBestWeight,
+				"new_best_weight": float64(maxWeight),
+				"new_best_reps":   correspondingReps,
+			})
 		}
 
 	}
 
-	response := map[string]string{"message": "Workout added successfully"}
+	// capture streak before updating
+	oldStreak, _ := app.Models.UserModel.FetchStreakData(sess.UserID)
+
+	err2 := app.UpdateWorkoutStreak(sess.UserID)
+	if err2 != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	// Capture new streak after update
+	newStreak, _ := app.Models.UserModel.FetchStreakData(sess.UserID)
+	response := map[string]interface{}{"message": "Workout added successfully",
+		"updated_bests": bestUpdates,
+		"Old_streak":    oldStreak,
+		"new_streak":    newStreak,
+	}
 	app.sendSuccessResponse(w, http.StatusCreated, response)
 }
 
-// AddHandler Handler to return users best in that particular exerciseId.
+// AddHandler Handler to return user's best in that particular exerciseId.
 func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 	// Validate Session
 	sess, err := app.Session(w, r)
