@@ -58,7 +58,7 @@ type Streak struct {
 	LastWorkoutDate time.Time `gorm:"not null"`
 	CurrentStreak   float64   `gorm:"not null"`
 	MaxStreak       float64   `gorm:"not null"`
-	User            Users     `gorm:"foreignKey:UserID;reference:ID;constraint:OnDelete:CASCADE"`
+	User            Users     `gorm:"foreignKey:UserID;reference:ID;constraint:OnDelete:CASCADE" json:"-"`
 }
 
 type Users struct {
