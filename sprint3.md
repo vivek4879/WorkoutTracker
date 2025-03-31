@@ -42,7 +42,7 @@ A new user profile page was added to allow users to view and edit their profile 
 
 ## 3. **Measurements Component**
 
-A new measurements component was created to allow users to record and update their body measurements, such as height, weight, chest, waist, and biceps. This feature enables users to track their fitness progress over time by keeping an accurate record of their body measurements.
+A new measurements component was created to allow users to record and update their body measurements, such as height, weight, etc. This feature enables users to track their fitness progress over time by keeping an accurate record of their body measurements.
 
 ### **Key Functionality:**
 
