@@ -1,6 +1,68 @@
 ## Detail work completed in Sprint 3
 
 ### 1. Frontend
+Measurements Feature
+During Sprint 3, we introduced a Measurements feature on the frontend that allows users to input and review their body measurements. This feature helps users track progress over time alongside their workouts.
+
+1. Measurements Form Component
+Location: src/Components/Measurements/MeasurementsForm.jsx
+
+Purpose: Enables users to enter or update measurements such as weight, neck, waist, chest, and more.
+
+Flow:
+
+Users navigate to the “Measurements” route (e.g., /measurements) to view a small, neat form styled similarly to the main dashboard page.
+
+Upon submission, localStorage is updated (or an API call can be made to the backend) and the user is redirected to the Measurements Display page to see the values they entered.
+
+Styling:
+
+We reused the same top navigation bar (yellow line, “Gambare!” heading) and .container class from the Dashboard to ensure a consistent look and feel.
+
+A white card/box is used to hold the input fields, with a subtle box shadow and rounded corners for a clean UI.
+
+2. Measurements Display Component
+Location: src/Components/Measurements/MeasurementsDisplay.jsx
+
+Purpose: Shows the user’s existing measurements in a visually appealing table.
+
+Flow:
+
+When users access /measurements/view, the component checks if any measurements are stored (either from localStorage or fetched from the backend’s /measurements endpoint).
+
+If measurements are found, a table displays each measurement (e.g., “Weight” and “70 kg”).
+
+If no measurements exist yet, a user-friendly “No measurements found…” message appears, prompting them to update.
+
+Styling:
+
+Matches the Dashboard colors and layout, including the topnav and .container background.
+
+Measurements appear in a table with column headers (Measurement / Value), ensuring readability with dark text (color: #333) on a white background.
+
+3. Routing Changes
+We added two routes in App.jsx (or wherever the router is defined):
+
+/measurements → Displays the MeasurementsForm component.
+
+/measurements/view → Displays the MeasurementsDisplay component.
+
+A Measurements link was inserted in the topnav (or in the dashboard) so users can quickly navigate to the form or display page.
+
+
+4. How to Use
+Navigate to http://localhost:5173/measurements (assuming default Vite port) to open the Measurements Form page.
+
+Enter values (e.g., weight, chest, etc.) and click Update.
+
+You’ll be automatically taken to the Measurements Display page (/measurements/view), where the new data appears in a neat table.
+
+If you need to update again, simply revisit /measurements to make changes.
+
+By adding these two components, we’ve significantly improved the user experience for tracking body metrics, aligning with the newly developed backend APIs for updating and retrieving measurements.
+
+
+
 
 ### 2. Backend
 In this sprint, several important APIs were added to enhance user interaction with the application. The new APIs focus on measurements,user performance tracking, and exercise management. Additionally, significant updates were made to the Add Workout API to track personal bests and update workout streaks.
@@ -105,6 +167,11 @@ In this sprint, several important APIs were added to enhance user interaction wi
 
 These improvements add more value to the platform by making it easier for users to track their progress, keep motivated through streaks, and enhance their workout experience.
 ## Unit Tests for FrontEnd
+We introduced unit tests (using Vitest and React Testing Library) for these new components:
+
+MeasurementsForm.test.jsx: Ensures localStorage (or API call) is triggered on submit and that input placeholders appear correctly.
+
+MeasurementsDisplay.test.jsx: Verifies that measurements are displayed in a table if data is available, and shows a “No measurements found” message otherwise.
 
 
 
