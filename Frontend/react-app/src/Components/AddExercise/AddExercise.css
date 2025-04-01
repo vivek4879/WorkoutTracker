@@ -1,0 +1,66 @@
+.addContainer {
+  display: flex;
+  justify-content: center;
+  color: black;
+}
+.selectExercise {
+  max-width: 576px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+.workouts {
+  color: black;
+  padding: 5px;
+  text-align: center;
+}
+
+.workouts:hover {
+  background-color: rgb(121, 121, 121);
+  cursor: pointer;
+}
+
+.exeContainer {
+}
+.expandedOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.workout-titles {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.workout {
+  display: flex;
+  justify-content: space-evenly;
+}
+.metrics {
+  width: 50px;
+  height: 20px;
+  color: black;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: 3px;
+}
+.addset {
+  font-size: 15px;
+  min-height: 20px;
+  width: 90px;
+  padding: 3px;
+  border-radius: 3px;
+  margin: auto;
+}
+
+.addButton {
+  width: 200px;
+  font-size: 15px;
+  background-color: rgb(129, 194, 149);
+  color: black;
+  padding: 10px;
+  margin: auto;
+  border-radius: 10px;
+}

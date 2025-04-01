@@ -33,7 +33,5 @@
 }
 
 .calBox.streak {
-  border: 2px solid rgb(72, 226, 116);
-  border-radius: 60%;
-  background-color: rgb(72, 226, 116);
+  color: rgb(0, 199, 0);
 }

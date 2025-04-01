@@ -22,6 +22,10 @@ type UserModelInterface interface {
 	GetAllExercises() ([]Exercises, error)
 	GetMeasurements(userID uint) (Measurements, error)
 	UpdateMeasurements(userID uint, measurements Measurements) error
+	InsertBlankMeasurements(userID uint) error
+	GetUserIDByEmail(email string) (uint, error)
+	FetchStreakData(userID uint) (*Streak, error)
+	UpsertStreak(streakData *Streak) error
 }
 
 // Ensure MyModel implements UserModelInterface
@@ -46,7 +50,15 @@ type Sessions struct {
 	UserID uint      `gorm:"column:userid;primaryKey;not null"`
 	Token  string    `gorm:"unique;not null"`
 	Expiry time.Time `gorm:"not null"`
-	User   Users     `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	User   Users     `gorm:"foreignKey:UserID;reference:ID;constraint:OnDelete:CASCADE"`
+}
+
+type Streak struct {
+	UserID          uint      `gorm:"column:userid;primaryKey;not null"`
+	LastWorkoutDate time.Time `gorm:"not null"`
+	CurrentStreak   float64   `gorm:"not null"`
+	MaxStreak       float64   `gorm:"not null"`
+	User            Users     `gorm:"foreignKey:UserID;reference:ID;constraint:OnDelete:CASCADE" json:"-"`
 }
 
 type Users struct {
@@ -64,7 +76,7 @@ type UserLogin struct {
 }
 
 type Measurements struct {
-	UserID     uint     `gorm:"column:userid;primaryKey;not null" json:"userid"`
+	Userid     uint     `gorm:"column:userid;primaryKey;not null;foreignKey:UserID;constraint:OnDelete:CASCADE" json:"userid"`
 	Weight     *float64 `gorm:"column:weight;" json:"weight,omitempty"`
 	Neck       *float64 `gorm:"column:neck;" json:"neck,omitempty"`
 	Shoulders  *float64 `gorm:"column:shoulders;" json:"shoulders,omitempty"`
@@ -79,6 +91,9 @@ type Measurements struct {
 	RightThigh *float64 `gorm:"column:right_thigh;" json:"right_thigh,omitempty"`
 	LeftCalf   *float64 `gorm:"column:left_calf;" json:"left_calf,omitempty"`
 	RightCalf  *float64 `gorm:"column:right_calf;" json:"right_calf,omitempty"`
+
+	// Foreign Key relationship with the Users table
+	User Users `gorm:"foreignKey:Userid;references:ID;constraint:OnDelete:CASCADE" json:"user"` // Foreign Key to Users
 }
 
 type WorkoutToUser struct {

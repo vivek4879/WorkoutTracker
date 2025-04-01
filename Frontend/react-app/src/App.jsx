@@ -14,6 +14,8 @@ import UserGoals from "./Components/UserGoals/usergoals.jsx";
 
 import MeasurementsForm from "./Components/Measurements/MeasurementsForm.jsx";
 import MeasurementsDisplay from "./Components/Measurements/MeasurementsDisplay.jsx";
+import AddExercise from "./Components/AddExercise/AddExercise.jsx";
+//  import Test from "./Components/test/test.jsx";
 
 function App() {
   return (
@@ -30,6 +32,9 @@ function App() {
           <Route path="/measurements" element={<MeasurementsForm />} />
           <Route path="/measurements/view" element={<MeasurementsDisplay />} />
 
+          <Route path="/addexercise" element={<AddExercise />} />
+          {/* <Route path="/test" element={<Test />} /> */}
+          {/* Redirect the root path to the login page */}
           <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Fallback route */}

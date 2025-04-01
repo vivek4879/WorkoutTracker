@@ -21,9 +21,7 @@ function MeasurementsDisplay() {
           <Link style={{ float: "right" }} to="/profile">
             Profile
           </Link>
-          <Link style={{ float: "right" }} to="/usergoals">
-            UserGoal
-          </Link>
+        
           <Link style={{ float: "right" }} to="/measurements">
             Measurements
           </Link>

@@ -1,5 +1,5 @@
-import Calendar from "./Calendar/Calendar";
 import { Link } from "react-router-dom";
+import Calendar from "./Calendar/Calendar";
 // import Calendar from "./Calendar/Calendar";
 import "./Dashboard.css";
 import { useEffect } from "react";
@@ -12,11 +12,11 @@ const Dashboard = () => {
     <div className="container">
       <div className="container">
         <div className="topnav">
-          <a className="active" href="#">
+          <a className="active" href="/dashboard">
             Home
           </a>
-          <a href="#">Add Workout</a>
-          <a href="/login" style={{ float: "right" }}>
+          <a href="/addexercise">Add Workout</a>
+          <a href="/profile" style={{ float: "right" }}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="23px"
@@ -30,33 +30,75 @@ const Dashboard = () => {
           <a href="/login" style={{ float: "right" }}>
             Logout
           </a>
-          <Link style={{ float: "right" }} to="/profile">
+           <Link style={{ float: "right" }} to="/profile">
             Profile
           </Link>
-         <Link style={{ float: "right" }} to="/measurements">
+           <Link style={{ float: "right" }} to="/measurements">
   Measurements
 </Link>
 
-          <Link style={{ float: "right" }} to="/usergoals">
-            UserGoal
-          </Link>
+         
 
+          {/* <Link style={{ float: "right" }} to="/usergoals">
+            UserGoal
+          </Link> */}
         </div>
         <div className="Logo">
           <h1 className="Page-Heading">Gambare!</h1>
         </div>
         <div className="header">
-          <h2 className="Page-Heading">Current Streak: 0</h2>
+          <h2 className="Page-Heading">Current Streak: 7</h2>
         </div>
         <Calendar />
         <div className="WorkoutContainer">
           <div className="Workouts">
             <h3>Past Workouts:</h3>
-            <div className="WorkoutCard">Monday</div>
-            <div className="WorkoutCard">Tuesday</div>
-            <div className="WorkoutCard">Wednesday</div>
-            <div className="WorkoutCard">Thursday</div>
-            <div className="WorkoutCard">Friday</div>
+            <div className="WorkoutCard">
+              <h3 className="cardText">Monday</h3>
+              <p className="cardText">Ab Wheel</p>
+              <p className="cardText">Sets: 7 Reps: 5</p>
+              <p className="cardText">Arnold Press (Dumbbell)</p>
+              <p className="cardText">Sets: 4 Reps: 9</p>
+              <p className="cardText">Around the World</p>
+              <p className="cardText">Sets: 7 Reps: 7</p>
+              <p className="cardText">Ab Wheel</p>
+              <p className="cardText">Sets: 3 Reps: 4</p>
+            </div>
+            <div className="WorkoutCard">
+              <h3 className="cardText">Tuesday</h3>
+              <p className="cardText">Aerobics</p>
+              <p className="cardText">Sets: 6 Reps: 2</p>
+              <p className="cardText">Ab Wheel</p>
+              <p className="cardText">Sets: 4 Reps: 8</p>
+            </div>
+            <div className="WorkoutCard">
+              <h3 className="cardText">Wednesday</h3>
+              <p className="cardText">Back Extension</p>
+              <p className="cardText">Sets: 9 Reps: 5</p>
+              <p className="cardText">Ab Wheel</p>
+              <p className="cardText">Sets: 3 Reps: 2</p>
+              <p className="cardText">Arnold Press (Dumbbell)</p>
+              <p className="cardText">Sets: 6 Reps: 7</p>
+            </div>
+            <div className="WorkoutCard">
+              <h3 className="cardText">Thursday</h3>
+              <p className="cardText">
+                Back Extensions <br />
+                (Machine)
+              </p>
+              <p className="cardText">Sets: 4 Reps: 7</p>
+              <p className="cardText">Back Extension</p>
+              <p className="cardText">Sets: 3 Reps: 4</p>
+            </div>
+            <div className="WorkoutCard">
+              <h3 className="cardText">Friday</h3>
+              <p className="cardText">Ball Slams</p>
+              <p className="cardText">Sets: 6 Reps: 8</p>
+              <p className="cardText">Ab Wheel</p>
+              <p className="cardText">Sets: 5 Reps: 7</p>
+              <p className="cardText">Around the World</p>
+              <p className="cardText">Sets: 4 Reps: 2</p>
+            </div>
           </div>
         </div>
       </div>
