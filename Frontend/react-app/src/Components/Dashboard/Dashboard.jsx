@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Calendar from "./Calendar/Calendar";
 // import Calendar from "./Calendar/Calendar";
 import "./Dashboard.css";
@@ -29,6 +30,15 @@ const Dashboard = () => {
           <a href="/login" style={{ float: "right" }}>
             Logout
           </a>
+           <Link style={{ float: "right" }} to="/profile">
+            Profile
+          </Link>
+           <Link style={{ float: "right" }} to="/measurements">
+  Measurements
+</Link>
+
+         
+
           {/* <Link style={{ float: "right" }} to="/usergoals">
             UserGoal
           </Link> */}
