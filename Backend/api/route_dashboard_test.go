@@ -307,3 +307,65 @@ func TestAddHandler(t *testing.T) {
 	// Ensure all mock expectations were met
 	mockUserModel.AssertExpectations(t)
 }
+
+func TestGetStreakDataHandler(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Mock session data
+	mockSession := &internal.Sessions{UserID: 3}
+	// Mock streak data
+	mockStreak := &internal.Streak{
+		UserID:        3,
+		CurrentStreak: 5,
+		MaxStreak:     10,
+	}
+
+	// Mock QuerySession to return valid session
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+	// Mock FetchStreakData to return mock streak
+	mockUserModel.On("FetchStreakData", mockSession.UserID).Return(mockStreak, nil)
+
+	// Setup mock application with session handler
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return mockSession, nil
+		},
+	}
+
+	// Create GET request
+	req := httptest.NewRequest("GET", "/streak", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+	rec := httptest.NewRecorder()
+
+	// Call handler
+	mockApp.GetStreakDataHandler(rec, req)
+
+	// Assert status code
+	if rec.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", rec.Code)
+	}
+
+	// Parse response
+	var response map[string]interface{}
+	if err := json.Unmarshal(rec.Body.Bytes(), &response); err != nil {
+		t.Fatalf("Failed to parse JSON response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	// Assert response content
+	if response["user_id"] != float64(mockSession.UserID) {
+		t.Errorf("Expected user_id %d, got %v", mockSession.UserID, response["user_id"])
+	}
+	if response["currentStreak"] != float64(mockStreak.CurrentStreak) {
+		t.Errorf("Expected currentStreak %v, got %v", mockStreak.CurrentStreak, response["currentStreak"])
+	}
+	if response["maxStreak"] != float64(mockStreak.MaxStreak) {
+		t.Errorf("Expected maxStreak %v, got %v", mockStreak.MaxStreak, response["maxStreak"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
