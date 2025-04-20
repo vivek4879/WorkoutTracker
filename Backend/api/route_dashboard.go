@@ -236,3 +236,23 @@ func (app *application) GetAllExercisesHandler(w http.ResponseWriter, r *http.Re
 
 	app.sendSuccessResponse(w, http.StatusOK, response)
 }
+func (app *application) GetStreakDataHandler(w http.ResponseWriter, r *http.Request) {
+	sess, err := app.Session(w, r)
+	if err != nil {
+		log.Printf("Error getting session: %v\n", err)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
+		return
+	}
+	StreakData, err := app.Models.UserModel.FetchStreakData(sess.UserID)
+	if err != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	response := map[string]interface{}{
+		"user_id":       sess.UserID,
+		"currentStreak": StreakData.CurrentStreak,
+		"maxStreak":     StreakData.MaxStreak,
+	}
+	app.sendSuccessResponse(w, http.StatusOK, response)
+
+}
