@@ -62,6 +62,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/exercises", app.GetAllExercisesHandler)
 	router.HandlerFunc(http.MethodGet, "/measurements", app.GetMeasurementsHandler)
 	router.HandlerFunc(http.MethodPut, "/update-measurements", app.UpdateMeasurementsHandler)
+	router.HandlerFunc(http.MethodGet, "/get-streak-data", app.GetStreakDataHandler)
 
 	return router
 }
