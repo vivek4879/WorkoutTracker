@@ -60,16 +60,25 @@ const AddExercise = () => {
     }));
   };
 
-  const items = [
-    [1, "Ab Wheel"],
-    [2, "Aerobics"],
-    [3, "Arnold Press (Dumbbell)"],
-    [4, "Around the World"],
-    [5, "Back Extension"],
-    [6, "Back Extensions (Machine)"],
-    [7, "Ball Slams"],
-    [8, "Battle Ropes"],
-  ];
+  // const items = [
+  //   [1, "Ab Wheel"],
+  //   [2, "Aerobics"],
+  //   [3, "Arnold Press (Dumbbell)"],
+  //   [4, "Around the World"],
+  //   [5, "Back Extension"],
+  //   [6, "Back Extensions (Machine)"],
+  //   [7, "Ball Slams"],
+  //   [8, "Battle Ropes"],
+  // ];
+  let items = [];
+
+  fetch("http://192.168.0.12:4000/exercises")
+    .then((response) => response.json())
+    .then((data) => {
+      items = data;
+      console.log(items);
+    })
+    .catch((error) => console.error(error));
 
   return (
     <div className="container">
@@ -98,7 +107,7 @@ const AddExercise = () => {
       </div>
       <div className="addContainer">
         <div className="selectExercise">
-          <h2>Exercise List</h2>
+          <h2 className="exeListHead">Exercise List</h2>
           {items.map((item, index) => (
             <div key={index}>
               <div
@@ -110,7 +119,9 @@ const AddExercise = () => {
               </div>
               {expandedItems[index] && (
                 <div className="expandedOptions">
-                  <p>Personal Best: {personalBests[item[0]] || "Loading..."}</p>
+                  <p className="pBest">
+                    Personal Best: {personalBests[item[0]] || "Loading..."}
+                  </p>
                   <div className="workout-titles">
                     <p>Set</p>
                     <p>KG/s</p>

@@ -83,8 +83,6 @@ The add workout page has been developed to allow users to log their workouts, tr
 - **Measurements Component:** Introduced a component for recording and tracking body measurements, enabling users to track physical progress alongside workout performance.
 - **Add Workout Page:** Enhanced the add workout page to allow users to log multiple sets per workout and track their personal bests and streaks effectively.
 
-These updates significantly improve the user experience by providing features that allow for better tracking, personalization, and progress monitoring, enhancing the overall fitness journey for users.
-
 ### 2. Backend
 
 In this sprint, several important APIs were added to enhance user interaction with the application. The new APIs focus on measurements,user performance tracking, and exercise management. Additionally, significant updates were made to the Add Workout API to track personal bests and update workout streaks.

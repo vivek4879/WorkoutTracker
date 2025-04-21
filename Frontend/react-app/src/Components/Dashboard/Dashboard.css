@@ -34,7 +34,7 @@
 .WorkoutCard {
   border: 2px solid #000000;
   min-height: 270px;
-  min-width: 180px;
+  min-width: 200px;
   margin: 5px;
   float: left;
   display: flex;
@@ -44,4 +44,5 @@
 
 .cardText {
   margin: 0px;
+  font-size: 20px;
 }

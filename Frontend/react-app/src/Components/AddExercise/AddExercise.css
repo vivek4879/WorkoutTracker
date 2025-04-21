@@ -13,6 +13,8 @@
   color: black;
   padding: 5px;
   text-align: center;
+  margin-top: 5px;
+  font-size: 20px;
 }
 
 .workouts:hover {
@@ -22,10 +24,18 @@
 
 .exeContainer {
 }
+.pBest {
+  font-size: 18px;
+  margin: auto;
+}
 .expandedOptions {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.exeListHead {
+  margin: 50px 20px 20px 20px;
 }
 
 .workout-titles {
@@ -42,7 +52,7 @@
   height: 20px;
   color: black;
   background-color: white;
-  border: 1px solid black;
+  border: 2px solid black;
   border-radius: 3px;
   margin: 3px;
 }
@@ -63,4 +73,5 @@
   padding: 10px;
   margin: auto;
   border-radius: 10px;
+  margin-top: 20px;
 }

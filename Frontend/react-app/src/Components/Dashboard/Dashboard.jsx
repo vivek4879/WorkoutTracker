@@ -7,6 +7,47 @@ const Dashboard = () => {
   useEffect(() => {
     document.title = "Dashboard | My App";
   }, []);
+  const workouts = [
+    {
+      day: "Monday",
+      exercises: [
+        { name: "Ab Wheel", sets: 7, reps: 5 },
+        { name: "Arnold Press (Dumbbell)", sets: 4, reps: 9 },
+        { name: "Around the World", sets: 7, reps: 7 },
+        { name: "Ab Wheel", sets: 3, reps: 4 },
+      ],
+    },
+    {
+      day: "Tuesday",
+      exercises: [
+        { name: "Aerobics", sets: 6, reps: 2 },
+        { name: "Ab Wheel", sets: 4, reps: 8 },
+      ],
+    },
+    {
+      day: "Wednesday",
+      exercises: [
+        { name: "Back Extension", sets: 9, reps: 5 },
+        { name: "Ab Wheel", sets: 3, reps: 2 },
+        { name: "Arnold Press (Dumbbell)", sets: 6, reps: 7 },
+      ],
+    },
+    {
+      day: "Thursday",
+      exercises: [
+        { name: "Back Extensions (Machine)", sets: 4, reps: 7 },
+        { name: "Back Extension", sets: 3, reps: 4 },
+      ],
+    },
+    {
+      day: "Friday",
+      exercises: [
+        { name: "Ball Slams", sets: 6, reps: 8 },
+        { name: "Ab Wheel", sets: 5, reps: 7 },
+        { name: "Around the World", sets: 4, reps: 2 },
+      ],
+    },
+  ];
   return (
     <div className="container">
       <div className="container">
@@ -43,52 +84,21 @@ const Dashboard = () => {
         <div className="WorkoutContainer">
           <div className="Workouts">
             <h3>Past Workouts:</h3>
-            <div className="WorkoutCard">
-              <h3 className="cardText">Monday</h3>
-              <p className="cardText">Ab Wheel</p>
-              <p className="cardText">Sets: 7 Reps: 5</p>
-              <p className="cardText">Arnold Press (Dumbbell)</p>
-              <p className="cardText">Sets: 4 Reps: 9</p>
-              <p className="cardText">Around the World</p>
-              <p className="cardText">Sets: 7 Reps: 7</p>
-              <p className="cardText">Ab Wheel</p>
-              <p className="cardText">Sets: 3 Reps: 4</p>
-            </div>
-            <div className="WorkoutCard">
-              <h3 className="cardText">Tuesday</h3>
-              <p className="cardText">Aerobics</p>
-              <p className="cardText">Sets: 6 Reps: 2</p>
-              <p className="cardText">Ab Wheel</p>
-              <p className="cardText">Sets: 4 Reps: 8</p>
-            </div>
-            <div className="WorkoutCard">
-              <h3 className="cardText">Wednesday</h3>
-              <p className="cardText">Back Extension</p>
-              <p className="cardText">Sets: 9 Reps: 5</p>
-              <p className="cardText">Ab Wheel</p>
-              <p className="cardText">Sets: 3 Reps: 2</p>
-              <p className="cardText">Arnold Press (Dumbbell)</p>
-              <p className="cardText">Sets: 6 Reps: 7</p>
-            </div>
-            <div className="WorkoutCard">
-              <h3 className="cardText">Thursday</h3>
-              <p className="cardText">
-                Back Extensions <br />
-                (Machine)
-              </p>
-              <p className="cardText">Sets: 4 Reps: 7</p>
-              <p className="cardText">Back Extension</p>
-              <p className="cardText">Sets: 3 Reps: 4</p>
-            </div>
-            <div className="WorkoutCard">
-              <h3 className="cardText">Friday</h3>
-              <p className="cardText">Ball Slams</p>
-              <p className="cardText">Sets: 6 Reps: 8</p>
-              <p className="cardText">Ab Wheel</p>
-              <p className="cardText">Sets: 5 Reps: 7</p>
-              <p className="cardText">Around the World</p>
-              <p className="cardText">Sets: 4 Reps: 2</p>
-            </div>
+            <ul className="WorkoutList">
+              {workouts.map((workout) => (
+                <li key={workout.day} className="WorkoutCard">
+                  <h3 className="cardText">{workout.day}</h3>
+                  {workout.exercises.map((exercise, idx) => (
+                    <div key={idx}>
+                      <p className="cardText">{exercise.name}</p>
+                      <p className="cardText">
+                        Sets: {exercise.sets} Reps: {exercise.reps}
+                      </p>
+                    </div>
+                  ))}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
