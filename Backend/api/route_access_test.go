@@ -138,28 +138,3 @@ func TestDeleteHandler(t *testing.T) {
 	// Ensure mock expectations were met
 	mockUserModel.AssertExpectations(t)
 }
-
-//func TestSignupHandler(t *testing.T) {
-//	// setting up test application
-//	app := application{Models: NewModels(setupTestDB())}
-//
-//	//mock user signup request
-//	reqBody := map[string]string{
-//		"firstname": "Vivek",
-//		"lastname":  "Aher",
-//		"email":     "test@email.com",
-//		"password":  "securepassword",
-//	}
-//
-//	//converting request body to JSON
-//	body, _ := json.Marshal(reqBody)
-//	//create mock HTTP request using Go's httptest package
-//	req := httptest.NewRequest("POST", "/signup", bytes.NewReader(body))
-//	req.Header.Set("Content-Type", "application/json")
-//	rec := httptest.NewRecorder()
-//
-//	app.signupHandler(rec, req)
-//	if rec.Code != http.StatusOK {
-//		t.Errorf("Expected status 200, got %d", rec.Code)
-//	}
-//}

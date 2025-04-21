@@ -61,6 +61,7 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 		Value:    sessionToken,
 		Expires:  expiresAt,
 		HttpOnly: true,
+		Path:     "/",
 	}
 	http.SetCookie(w, &cookie)
 	response := map[string]string{

@@ -369,3 +369,58 @@ func TestGetStreakDataHandler(t *testing.T) {
 
 	mockUserModel.AssertExpectations(t)
 }
+
+func TestSignupHandler_UserAlreadyExists(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Simulate user already exists by returning some user data instead of error
+	mockUserModel.On("Query", "test@email.com").Return(&internal.Users{
+		ID:        1,
+		FirstName: "Existing",
+		LastName:  "User",
+		Email:     "test@email.com",
+	}, nil)
+
+	mockModels := internal.Models{
+		UserModel: mockUserModel,
+	}
+	app := application{Models: mockModels}
+
+	reqBody := map[string]string{
+		"firstname": "Vivek",
+		"lastname":  "Aher",
+		"email":     "test@email.com",
+		"password":  "securepassword",
+	}
+
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Error("Failed to marshal request body")
+	}
+	req := httptest.NewRequest("POST", "/signup", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	// Call signupHandler
+	app.signupHandler(rec, req)
+
+	// Check the HTTP status code
+	if rec.Code != http.StatusConflict {
+		t.Errorf("Expected status code %d, got %d", http.StatusConflict, rec.Code)
+	}
+
+	// Check response body message
+	var response map[string]string
+	err = json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	expectedMessage := "Email already exists"
+	if response["error"] != expectedMessage {
+		t.Errorf("Expected error message %q, got %q", expectedMessage, response["error"])
+	}
+
+	// Assert expectations
+	mockUserModel.AssertExpectations(t)
+}
