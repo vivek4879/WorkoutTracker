@@ -62,7 +62,7 @@ function Login() {
       </div>
 
       <div className="Login">
-        <div className="header">
+        <div className="Header">
           <h2 className="Page-Heading">Login</h2>
         </div>
         <div className="inputs">
@@ -90,7 +90,7 @@ function Login() {
         </div>
         <div>{token && <p style={{ color: "red" }}>{token}</p>}</div>
         <div className="forgot-password" onClick={handleForgotPass}>
-          <div className="header">
+          <div className="Header">
             <Link>Forgot Password?</Link>
           </div>
         </div>

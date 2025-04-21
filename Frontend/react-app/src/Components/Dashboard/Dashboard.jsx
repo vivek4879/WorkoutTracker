@@ -54,9 +54,17 @@ const Dashboard = () => {
         { name: "Around the World", sets: 4, reps: 2 },
       ],
     },
+    {
+      day: "Saturday",
+      exercises: [
+        { name: "Ball Slams", sets: 6, reps: 8 },
+        { name: "Ab Wheel", sets: 5, reps: 7 },
+        { name: "Around the World", sets: 4, reps: 2 },
+      ],
+    },
   ];
   return (
-    <div className="container">
+    <div className="dashcontainer">
       <div className="topnav">
         <a className="active" href="/dashboard">
           Home
@@ -76,14 +84,14 @@ const Dashboard = () => {
         <a href="/login" style={{ float: "right" }}>
           Logout
         </a>
-        <a style={{ float: "right" }} href="/measurements">
+        <a href="/measurements" style={{ float: "right" }}>
           Measurements
         </a>
       </div>
       <div className="Logo">
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
-      <div className="header">
+      <div className="Header">
         <h2 className="Page-Heading">Current Streak: 7</h2>
       </div>
       <Calendar />
@@ -93,19 +101,21 @@ const Dashboard = () => {
           <ul className="WorkoutList">
             <CRow className="g-3">
               {workouts.map((workout) => (
-                <CCol key={workout.day} xs={12} sm={6} md={4} lg={3}>
-                  <CCard className="border-secondary h-100">
-                    <CCardHeader className="fw-bold border-90">
+                <CCol key={workout.day} xs={12} sm={6} md={4} lg={2}>
+                  <CCard className="h-100">
+                    <CCardHeader className="fw-bold border-0 text-center">
                       {workout.day}
                     </CCardHeader>
                     <CCardBody>
                       {workout.exercises.map((exercise, idx) => (
-                        <div key={idx} className="mb-2">
-                          <CCardText className="mb-1">
+                        <div key={idx} className="mb-1 text-center">
+                          <CCardText className="mb-1 text-center">
                             {exercise.name}
                           </CCardText>
                           <CCardText>
-                            Sets: {exercise.sets} • Reps: {exercise.reps}
+                            <small>
+                              Sets: {exercise.sets} Reps: {exercise.reps}
+                            </small>
                           </CCardText>
                         </div>
                       ))}

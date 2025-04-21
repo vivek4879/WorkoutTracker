@@ -81,7 +81,7 @@ const AddExercise = () => {
   //   .catch((error) => console.error(error));
 
   return (
-    <div className="container">
+    <div className="dashcontainer">
       <div className="topnav">
         <a href="/dashboard">Home</a>
         <a className="active" href="#">
