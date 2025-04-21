@@ -1,3 +1,9 @@
+.dashcontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
 .topnav {
   background-color: #ffeb00;
   width: 100%;
@@ -20,28 +26,18 @@
   background-color: #323232;
   color: white;
 }
-.WorkoutContainer {
-  display: flex;
-  justify-content: space-evenly;
-  margin-top: -25px;
-}
 
 .Workouts {
   color: #000000;
   font-weight: 300;
 }
 
-.WorkoutCard {
-  border: 2px solid #000000;
-  min-height: 270px;
-  min-width: 180px;
-  margin: 5px;
-  float: left;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.cardHead {
+  margin: auto;
 }
 
 .cardText {
-  margin: 0px;
+  margin: auto;
+  font-size: 18px;
+  padding: auto;
 }

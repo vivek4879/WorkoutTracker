@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 100%;
 }
 .Logo {
   text-align: center;
@@ -15,15 +16,17 @@
   padding-bottom: 10px;
 }
 
-.header {
+.Header {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  background-color: none;
 }
 
 .Page-Heading {
   color: #000000;
+  margin: 20px;
 }
 .submit-button {
   background-color: #008cba;
