@@ -6,7 +6,6 @@ function Calendar() {
   var offset = newDate.getDay();
   const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const week1 = [...Array(7).keys()].map((x) => x + 1);
-  const month = [];
   // console.log(squares);
   // const week1 = [1, 2, 3, 4, 5, 6, 7];
   return (

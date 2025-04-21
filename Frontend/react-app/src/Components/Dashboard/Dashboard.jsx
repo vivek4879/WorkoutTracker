@@ -16,7 +16,7 @@ const Dashboard = () => {
   }, []);
   const workouts = [
     {
-      day: "Monday",
+      day: "Wednesday",
       exercises: [
         { name: "Ab Wheel", sets: 7, reps: 5 },
         { name: "Arnold Press (Dumbbell)", sets: 4, reps: 9 },
@@ -25,14 +25,14 @@ const Dashboard = () => {
       ],
     },
     {
-      day: "Tuesday",
+      day: "Thursday",
       exercises: [
         { name: "Aerobics", sets: 6, reps: 2 },
         { name: "Ab Wheel", sets: 4, reps: 8 },
       ],
     },
     {
-      day: "Wednesday",
+      day: "Friday",
       exercises: [
         { name: "Back Extension", sets: 9, reps: 5 },
         { name: "Ab Wheel", sets: 3, reps: 2 },
@@ -40,22 +40,14 @@ const Dashboard = () => {
       ],
     },
     {
-      day: "Thursday",
+      day: "Saturday",
       exercises: [
         { name: "Back Extensions (Machine)", sets: 4, reps: 7 },
         { name: "Back Extension", sets: 3, reps: 4 },
       ],
     },
     {
-      day: "Friday",
-      exercises: [
-        { name: "Ball Slams", sets: 6, reps: 8 },
-        { name: "Ab Wheel", sets: 5, reps: 7 },
-        { name: "Around the World", sets: 4, reps: 2 },
-      ],
-    },
-    {
-      day: "Saturday",
+      day: "Sunday",
       exercises: [
         { name: "Ball Slams", sets: 6, reps: 8 },
         { name: "Ab Wheel", sets: 5, reps: 7 },
@@ -98,33 +90,32 @@ const Dashboard = () => {
       <div className="WorkoutContainer">
         <div className="Workouts">
           <h3>Past Workouts:</h3>
-          <ul className="WorkoutList">
-            <CRow className="g-3">
-              {workouts.map((workout) => (
-                <CCol key={workout.day} xs={12} sm={6} md={4} lg={2}>
-                  <CCard className="h-100">
-                    <CCardHeader className="fw-bold border-0 text-center">
-                      {workout.day}
-                    </CCardHeader>
-                    <CCardBody>
-                      {workout.exercises.map((exercise, idx) => (
-                        <div key={idx} className="mb-1 text-center">
-                          <CCardText className="mb-1 text-center">
-                            {exercise.name}
-                          </CCardText>
-                          <CCardText>
-                            <small>
-                              Sets: {exercise.sets} Reps: {exercise.reps}
-                            </small>
-                          </CCardText>
-                        </div>
-                      ))}
-                    </CCardBody>
-                  </CCard>
-                </CCol>
-              ))}
-            </CRow>
-          </ul>
+          <CRow className="justify-content-center">
+            {workouts.map((workout) => (
+              <CCol key={workout.day}>
+                <CCard className="h-100 w-80">
+                  <CCardHeader
+                    as="h4"
+                    className="fw-bold background-primary text-center"
+                  >
+                    {workout.day}
+                  </CCardHeader>
+                  <CCardBody>
+                    {workout.exercises.map((exercise, idx) => (
+                      <div key={idx} className="mb-1">
+                        <CCardText className="mb-1">{exercise.name}</CCardText>
+                        <CCardText>
+                          <small>
+                            Sets: {exercise.sets} Reps: {exercise.reps}
+                          </small>
+                        </CCardText>
+                      </div>
+                    ))}
+                  </CCardBody>
+                </CCard>
+              </CCol>
+            ))}
+          </CRow>
         </div>
       </div>
     </div>
