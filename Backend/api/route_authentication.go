@@ -11,7 +11,7 @@ import (
 
 func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5174")
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5173")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
