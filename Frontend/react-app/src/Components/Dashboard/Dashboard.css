@@ -33,16 +33,21 @@
 
 .WorkoutCard {
   border: 2px solid #000000;
-  min-height: 270px;
-  min-width: 200px;
+  border-radius: 20px;
+  min-height: 200px;
+  min-width: 120px;
   margin: 5px;
   float: left;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  /* align-items: center; */
+}
+
+.cardHead {
+  margin: auto;
 }
 
 .cardText {
-  margin: 0px;
-  font-size: 20px;
+  margin: auto;
+  font-size: 18px;
+  padding: auto;
 }

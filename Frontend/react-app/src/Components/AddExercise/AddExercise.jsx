@@ -60,25 +60,25 @@ const AddExercise = () => {
     }));
   };
 
-  // const items = [
-  //   [1, "Ab Wheel"],
-  //   [2, "Aerobics"],
-  //   [3, "Arnold Press (Dumbbell)"],
-  //   [4, "Around the World"],
-  //   [5, "Back Extension"],
-  //   [6, "Back Extensions (Machine)"],
-  //   [7, "Ball Slams"],
-  //   [8, "Battle Ropes"],
-  // ];
-  let items = [];
+  const items = [
+    [1, "Ab Wheel"],
+    [2, "Aerobics"],
+    [3, "Arnold Press (Dumbbell)"],
+    [4, "Around the World"],
+    [5, "Back Extension"],
+    [6, "Back Extensions (Machine)"],
+    [7, "Ball Slams"],
+    [8, "Battle Ropes"],
+  ];
+  // let items = [];
 
-  fetch("http://192.168.0.12:4000/exercises")
-    .then((response) => response.json())
-    .then((data) => {
-      items = data;
-      console.log(items);
-    })
-    .catch((error) => console.error(error));
+  // fetch("http://192.168.0.12:4000/exercises")
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     items = data;
+  //     console.log(items);
+  //   })
+  //   .catch((error) => console.error(error));
 
   return (
     <div className="container">

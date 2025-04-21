@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 100%;
 }
 .Logo {
   text-align: center;
@@ -24,6 +25,7 @@
 
 .Page-Heading {
   color: #000000;
+  margin: 20px;
 }
 .submit-button {
   background-color: #008cba;
