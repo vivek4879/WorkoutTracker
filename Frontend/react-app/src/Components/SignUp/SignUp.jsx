@@ -47,7 +47,7 @@ const SignUp = () => {
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
       <div className="SignUp">
-        <div className="header">
+        <div className="Header">
           <h2 className="Page-Heading">Sign Up</h2>
         </div>
         <div className="inputs">

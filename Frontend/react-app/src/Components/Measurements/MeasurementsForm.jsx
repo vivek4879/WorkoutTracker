@@ -22,7 +22,7 @@ function MeasurementsForm() {
 
   return (
     // Container class to get the same pale background color
-    <div className="container">
+    <div className="dashcontainer">
       {/* 
         1) Same topnav bar used by your Dashboard (with black left area & yellow).
            This gives you the "yellow line" across the top.
@@ -56,7 +56,7 @@ function MeasurementsForm() {
       </div>
 
       {/* 3) A subheading or page title, if you want it */}
-      <div className="header">
+      <div className="Header">
         <h2 className="Page-Heading">Enter Measurements</h2>
       </div>
 

@@ -1,7 +1,7 @@
 describe("template spec", () => {
   beforeEach(() => {
     // Visit the login page before each test
-    cy.visit("http://192.168.0.200:5174/");
+    cy.visit("http://192.168.0.200:5173/");
   });
   it("Should show the login form", () => {
     // Check if the login form or title text is visible
