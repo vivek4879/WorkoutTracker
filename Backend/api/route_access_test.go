@@ -139,27 +139,96 @@ func TestDeleteHandler(t *testing.T) {
 	mockUserModel.AssertExpectations(t)
 }
 
-//func TestSignupHandler(t *testing.T) {
-//	// setting up test application
-//	app := application{Models: NewModels(setupTestDB())}
-//
-//	//mock user signup request
-//	reqBody := map[string]string{
-//		"firstname": "Vivek",
-//		"lastname":  "Aher",
-//		"email":     "test@email.com",
-//		"password":  "securepassword",
-//	}
-//
-//	//converting request body to JSON
-//	body, _ := json.Marshal(reqBody)
-//	//create mock HTTP request using Go's httptest package
-//	req := httptest.NewRequest("POST", "/signup", bytes.NewReader(body))
-//	req.Header.Set("Content-Type", "application/json")
-//	rec := httptest.NewRecorder()
-//
-//	app.signupHandler(rec, req)
-//	if rec.Code != http.StatusOK {
-//		t.Errorf("Expected status 200, got %d", rec.Code)
-//	}
-//}
+//Unhappy path tests
+
+func TestSignupHandler_UserAlreadyExists(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Simulate user already exists by returning some user data instead of error
+	mockUserModel.On("Query", "test@email.com").Return(&database.Users{
+		ID:        1,
+		FirstName: "Existing",
+		LastName:  "User",
+		Email:     "test@email.com",
+	}, nil)
+
+	mockModels := database.Models{
+		UserModel: mockUserModel,
+	}
+	app := application{Models: mockModels}
+
+	reqBody := map[string]string{
+		"firstname": "Vivek",
+		"lastname":  "Aher",
+		"email":     "test@email.com",
+		"password":  "securepassword",
+	}
+
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Error("Failed to marshal request body")
+	}
+	req := httptest.NewRequest("POST", "/signup", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	// Call signupHandler
+	app.signupHandler(rec, req)
+
+	// Check the HTTP status code
+	if rec.Code != http.StatusConflict {
+		t.Errorf("Expected status code %d, got %d", http.StatusConflict, rec.Code)
+	}
+
+	// Check response body message
+	var response map[string]string
+	err = json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+
+	expectedMessage := "Email already exists"
+	if response["error"] != expectedMessage {
+		t.Errorf("Expected error message %q, got %q", expectedMessage, response["error"])
+	}
+
+	// Assert expectations
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestDeleteHandler_SessionNotFound(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+	mockUserModel.On("QuerySession", "mock-session-token").Return(nil, errors.New("session not found"))
+
+	app := application{Models: database.Models{UserModel: mockUserModel}}
+
+	req := httptest.NewRequest("DELETE", "/delete", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+	rec := httptest.NewRecorder()
+
+	app.deleteHandler(rec, req)
+
+	assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Unauthorized: Invalid session", response["error"])
+
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestDeleteHandler_MissingSessionToken(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+	app := application{Models: database.Models{UserModel: mockUserModel}}
+
+	req := httptest.NewRequest("DELETE", "/delete", nil)
+	rec := httptest.NewRecorder()
+
+	app.deleteHandler(rec, req)
+
+	assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Unauthorized: Invalid session", response["error"])
+}

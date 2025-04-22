@@ -47,22 +47,35 @@ func Hashing(password string) string {
 }
 
 func (app *application) Session(w http.ResponseWriter, r *http.Request) (sess internal.Sessions, err error) {
+	fmt.Println(r.Cookies())
+	cookieVal := ""
 	cookie, err := r.Cookie("session_token")
 	if cookie == nil || err != nil {
-		fmt.Println("cookie not found/error occurred while getting session_token")
+		fmt.Println("cookie not found while getting session_token")
 	} else {
 		fmt.Println("cookie found " + cookie.Value)
+		cookieVal = cookie.Value
 	}
+
+	if cookieVal == "" {
+		fmt.Println("Session token header is: " + r.Header.Get("Session-Token"))
+		cookieVal = r.Header.Get("Session-Token")
+		if cookieVal != "" {
+			err = nil
+		}
+	}
+
 	if err != nil {
 		// errors.Is() checks if error matches a specific type even if its wrapped inside another error
 		if errors.Is(err, http.ErrNoCookie) {
-			return internal.Sessions{}, errors.New("No session token cookie")
+			return internal.Sessions{}, errors.New("no session token cookie")
 		}
-		return internal.Sessions{}, fmt.Errorf("Error getting session token: %w", err)
+		return internal.Sessions{}, fmt.Errorf("error getting session token: %w", err)
 	}
-	s, err := app.Models.UserModel.QuerySession(cookie.Value)
+
+	s, err := app.Models.UserModel.QuerySession(cookieVal)
 	if err != nil {
-		return internal.Sessions{}, errors.New("Invalid or expired Session")
+		return internal.Sessions{}, errors.New("invalid or expired Session")
 	}
 	return *s, nil
 }

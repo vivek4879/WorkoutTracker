@@ -47,16 +47,16 @@ func TestSession(t *testing.T) {
 	reqNoCookie := httptest.NewRequest("GET", "/protected", nil)
 	recNoCookie := httptest.NewRecorder()
 	_, errNoCookie := mockApp.Session(recNoCookie, reqNoCookie)
-	if errNoCookie == nil || errNoCookie.Error() != "No session token cookie" {
+	if errNoCookie == nil || errNoCookie.Error() != "no session token cookie" {
 		t.Errorf("Expected no session token cookie, got %v", errNoCookie)
 	}
-	mockUserModel.On("QuerySession", "invalid-session").Return(nil, errors.New("Invalid session"))
+	mockUserModel.On("QuerySession", "invalid-session").Return(nil, errors.New("invalid session"))
 	reqInvalid := httptest.NewRequest("GET", "/protected", nil)
 	reqInvalid.AddCookie(&http.Cookie{Name: "session_token", Value: "invalid-session"})
 	recInvalid := httptest.NewRecorder()
 	_, errInvalid := mockApp.Session(recInvalid, reqInvalid)
-	if errInvalid == nil || errInvalid.Error() != "Invalid or expired Session" {
-		t.Errorf("Expected 'Invalid or expired Session' error, got %v", errInvalid)
+	if errInvalid == nil || errInvalid.Error() != "invalid or expired Session" {
+		t.Errorf("Expected 'invalid or expired Session' error, got %v", errInvalid)
 	}
 	mockUserModel.AssertExpectations(t)
 }

@@ -40,13 +40,28 @@ func main() {
 }
 
 func (app *application) AuthenticationOptionsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5174")
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5173")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	w.WriteHeader(http.StatusOK)
 
+}
+func (app *application) AddWorkoutOptionsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5173")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, session-token")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.WriteHeader(http.StatusOK)
+}
+
+func (app *application) GetAllExercisesOptionsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5173")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (app *application) routes() http.Handler {
@@ -58,8 +73,10 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPost, "/logout", app.logoutHandler)
 	router.HandlerFunc(http.MethodDelete, "/delete-account", app.deleteHandler)
 	router.HandlerFunc(http.MethodPost, "/add-workout", app.AddWorkoutHandler)
+	router.HandlerFunc(http.MethodOptions, "/add-workout", app.AddWorkoutOptionsHandler)
 	router.HandlerFunc(http.MethodGet, "/user-best", app.AddHandler)
 	router.HandlerFunc(http.MethodGet, "/exercises", app.GetAllExercisesHandler)
+	router.HandlerFunc(http.MethodOptions, "/exercises", app.GetAllExercisesOptionsHandler)
 	router.HandlerFunc(http.MethodGet, "/measurements", app.GetMeasurementsHandler)
 	router.HandlerFunc(http.MethodPut, "/update-measurements", app.UpdateMeasurementsHandler)
 	router.HandlerFunc(http.MethodGet, "/get-streak-data", app.GetStreakDataHandler)
