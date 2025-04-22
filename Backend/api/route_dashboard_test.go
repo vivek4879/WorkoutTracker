@@ -482,3 +482,58 @@ func TestDashboardHandler_MissingSessionCookie(t *testing.T) {
 		t.Errorf("Expected error 'Unauthorized: session token missing or invalid', got %q", response["error"])
 	}
 }
+
+func TestAddWorkoutHandler_InsertWorkoutFails(t *testing.T) {
+	const userID uint = 1
+	mockUserModel := new(MockUserModel)
+	mockSession := &internal.Sessions{UserID: userID}
+	exerciseID := uint(101)
+
+	workoutData := []internal.ExerciseData{
+		{
+			ExerciseId: exerciseID,
+			Sets: []internal.WorkoutSet{
+				{SetNo: 1, Repetitions: 10, Weight: 50},
+			},
+		},
+	}
+
+	// Set expectations
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+	mockUserModel.On("InsertWorkout", userID, workoutData).Return(nil, errors.New("insert workout failed"))
+
+	app := application{
+		Models: internal.Models{UserModel: mockUserModel},
+	}
+
+	reqBody := map[string]interface{}{
+		"workouts": workoutData,
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest("POST", "/add-workout", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+	rec := httptest.NewRecorder()
+
+	app.AddWorkoutHandler(rec, req)
+
+	// Assert HTTP 500 status
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Assert error response body
+	var resp map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &resp)
+	if err != nil {
+		t.Fatalf("Failed to parse response JSON: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expected := "Internal Server Error"
+	if resp["error"] != expected {
+		t.Errorf("Expected error message %q, got %q", expected, resp["error"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
