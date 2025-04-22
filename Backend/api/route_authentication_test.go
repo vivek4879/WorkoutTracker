@@ -4,6 +4,7 @@ import (
 	internal "WorkoutTracker/internal/database"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/stretchr/testify/mock"
 	"net/http"
@@ -93,6 +94,103 @@ func TestAuthenticationHandler(t *testing.T) {
 	}
 
 	// Ensure mock expectations were met
+	mockUserModel.AssertExpectations(t)
+	mockHasher.AssertExpectations(t)
+}
+
+//Unhappy Path tests
+
+func TestAuthenticationHandler_UserNotFound(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+	mockHasher := new(MockPasswordHasher)
+
+	testEmail := "test@email.com"
+	testPassword := "securepassword"
+
+	// Mock Query to simulate user not found
+	mockUserModel.On("Query", testEmail).Return(nil, errors.New("user not found"))
+
+	app := application{
+		Models:         internal.Models{UserModel: mockUserModel},
+		PasswordHasher: mockHasher,
+	}
+
+	reqBody := map[string]string{
+		"email":    testEmail,
+		"password": testPassword,
+	}
+	body, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/authenticate", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	app.AuthenticationHandler(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status 401, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+	expected := "Invalid email or password"
+	if response["error"] != expected {
+		t.Errorf("Expected error %q, got %q", expected, response["error"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestAuthenticationHandler_InvalidPassword(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+	mockHasher := new(MockPasswordHasher)
+
+	testEmail := "test@email.com"
+	testPassword := "wrongpassword"
+	correctPassword := "correctpassword"
+	hashedPassword, _ := argon2id.CreateHash(correctPassword, argon2id.DefaultParams)
+
+	mockUser := &internal.Users{
+		ID:       1,
+		Email:    testEmail,
+		Password: hashedPassword,
+	}
+
+	mockUserModel.On("Query", testEmail).Return(mockUser, nil)
+	mockHasher.On("Compare", testPassword, hashedPassword).Return(false, nil)
+
+	app := application{
+		Models:         internal.Models{UserModel: mockUserModel},
+		PasswordHasher: mockHasher,
+	}
+
+	reqBody := map[string]string{
+		"email":    testEmail,
+		"password": testPassword,
+	}
+	body, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/authenticate", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	app.AuthenticationHandler(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status 401, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response JSON")
+	}
+	expected := "Invalid email or password"
+	if response["error"] != expected {
+		t.Errorf("Expected error %q, got %q", expected, response["error"])
+	}
+
 	mockUserModel.AssertExpectations(t)
 	mockHasher.AssertExpectations(t)
 }

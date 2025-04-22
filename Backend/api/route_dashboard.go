@@ -79,6 +79,10 @@ func (app *application) DashboardHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (app *application) AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5173")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, session-token")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	//Validate Session
 	sess, err := app.Session(w, r)
 	if err != nil {
@@ -211,6 +215,10 @@ func (app *application) AddHandler(w http.ResponseWriter, r *http.Request) {
 	app.sendSuccessResponse(w, http.StatusOK, response)
 }
 func (app *application) GetAllExercisesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://192.168.0.200:5173")
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	exercises, err := app.Models.UserModel.GetAllExercises()
 	if err != nil {
 		log.Printf("Error fetching exercises: %v\n", err)
@@ -235,4 +243,24 @@ func (app *application) GetAllExercisesHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	app.sendSuccessResponse(w, http.StatusOK, response)
+}
+func (app *application) GetStreakDataHandler(w http.ResponseWriter, r *http.Request) {
+	sess, err := app.Session(w, r)
+	if err != nil {
+		log.Printf("Error getting session: %v\n", err)
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Unauthorized: Invalid session")
+		return
+	}
+	StreakData, err := app.Models.UserModel.FetchStreakData(sess.UserID)
+	if err != nil {
+		app.sendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	response := map[string]interface{}{
+		"user_id":       sess.UserID,
+		"currentStreak": StreakData.CurrentStreak,
+		"maxStreak":     StreakData.MaxStreak,
+	}
+	app.sendSuccessResponse(w, http.StatusOK, response)
+
 }

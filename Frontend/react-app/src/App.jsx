@@ -11,9 +11,11 @@ import ForgotPass from "./Components/ForgotPass/ForgotPass.jsx";
 import Dashboard from "./Components/Dashboard/Dashboard.jsx";
 import Profile from "./Components/UserProfile/Profile.jsx";
 import UserGoals from "./Components/UserGoals/usergoals.jsx";
-import MeasurementsForm from "./Components/Measurements/MeasurementsForm";
-import MeasurementsDisplay from "./Components/Measurements/MeasurementsDisplay";
 
+
+
+import MeasurementsForm from "./Components/Measurements/MeasurementsForm.jsx";
+import MeasurementsDisplay from "./Components/Measurements/MeasurementsDisplay.jsx";
 
 import AddExercise from "./Components/AddExercise/AddExercise.jsx";
 //  import Test from "./Components/test/test.jsx";
@@ -31,6 +33,7 @@ function App() {
           <Route path="/usergoals" element={<UserGoals />} />
           
       
+
           <Route path="/measurements" element={<MeasurementsForm />} />
           <Route path="/measurements/display" element={<MeasurementsDisplay />} />
           

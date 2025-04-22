@@ -26,6 +26,14 @@ function MeasurementsForm() {
         style={{ backgroundColor: "#ffeb00" }}
       >
         <a href="/dashboard" className="active">
+    // Container class to get the same pale background color
+    <div className="dashcontainer">
+      {/* 
+        1) Same topnav bar used by your Dashboard (with black left area & yellow).
+           This gives you the "yellow line" across the top.
+      */}
+      <div className="topnav">
+        <a className="active" href="#">
           Home
         </a>
         <a href="/addexercise">Add Workout</a>
@@ -46,6 +54,9 @@ function MeasurementsForm() {
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
       <div className="header">
+
+      {/* 3) A subheading or page title, if you want it */}
+      <div className="Header">
         <h2 className="Page-Heading">Enter Measurements</h2>
       </div>
 
