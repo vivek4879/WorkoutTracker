@@ -592,3 +592,54 @@ func TestAddHandler_QueryUserBestFails(t *testing.T) {
 
 	mockUserModel.AssertExpectations(t)
 }
+
+func TestGetStreakDataHandler_FetchStreakFails(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Mock session
+	mockSession := &internal.Sessions{UserID: 3}
+
+	// Mock QuerySession to return valid session
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+
+	// Simulate FetchStreakData failure
+	mockUserModel.On("FetchStreakData", mockSession.UserID).Return(nil, errors.New("streak not found"))
+
+	// Setup mock app with mocked session
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return mockSession, nil
+		},
+	}
+
+	// Create GET request with session cookie
+	req := httptest.NewRequest("GET", "/streak", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	mockApp.GetStreakDataHandler(rec, req)
+
+	// Assert status code
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Assert error response
+	var response map[string]string
+	if err := json.Unmarshal(rec.Body.Bytes(), &response); err != nil {
+		t.Fatalf("Failed to parse JSON response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expectedError := "Internal Server Error"
+	if response["error"] != expectedError {
+		t.Errorf("Expected error message %q, got %q", expectedError, response["error"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
