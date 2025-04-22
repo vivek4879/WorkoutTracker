@@ -216,3 +216,19 @@ func TestDeleteHandler_SessionNotFound(t *testing.T) {
 
 	mockUserModel.AssertExpectations(t)
 }
+
+func TestDeleteHandler_MissingSessionToken(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+	app := application{Models: database.Models{UserModel: mockUserModel}}
+
+	req := httptest.NewRequest("DELETE", "/delete", nil)
+	rec := httptest.NewRecorder()
+
+	app.deleteHandler(rec, req)
+
+	assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Unauthorized: Invalid session", response["error"])
+}
