@@ -409,3 +409,42 @@ func TestGetAllExercisesHandler_DBError(t *testing.T) {
 	// Check mock expectations
 	mockUserModel.AssertExpectations(t)
 }
+
+func TestDashboardHandler_InvalidTokenInDB(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Return error when QuerySession is called with token
+	mockUserModel.On("QuerySession", "invalid-token").Return(nil, errors.New("invalid session"))
+
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return nil, errors.New("invalid session")
+		},
+	}
+
+	req := httptest.NewRequest("GET", "/dashboard", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "invalid-token"})
+
+	rec := httptest.NewRecorder()
+
+	mockApp.DashboardHandler(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected 401 Unauthorized, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response")
+	}
+
+	if response["error"] != "Unauthorized: Invalid session" {
+		t.Errorf("Expected error message 'Unauthorized: invalid session', got %q", response["error"])
+	}
+}
