@@ -448,3 +448,37 @@ func TestDashboardHandler_InvalidTokenInDB(t *testing.T) {
 		t.Errorf("Expected error message 'Unauthorized: invalid session', got %q", response["error"])
 	}
 }
+
+func TestDashboardHandler_MissingSessionCookie(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return nil, errors.New("no session token cookie")
+		},
+	}
+
+	req := httptest.NewRequest("GET", "/dashboard", nil)
+	rec := httptest.NewRecorder()
+
+	mockApp.DashboardHandler(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected 401 Unauthorized, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response")
+	}
+
+	if response["error"] != "Unauthorized: Invalid session" {
+		t.Errorf("Expected error 'Unauthorized: session token missing or invalid', got %q", response["error"])
+	}
+}
