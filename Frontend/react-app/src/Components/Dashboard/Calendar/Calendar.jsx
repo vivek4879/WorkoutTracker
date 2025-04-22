@@ -44,7 +44,7 @@ function Calendar() {
         </div>
         <div className="week">
           {week1.map((num) => (
-            <div className="calBox" key={num + 14}>
+            <div className="calBox streak" key={num + 14}>
               {num + 14 - offset > 0 && (
                 <div>
                   <p>{num + 14 - offset}</p>
@@ -66,7 +66,7 @@ function Calendar() {
         </div>
         <div className="week">
           {week1.map((num) => (
-            <div className="calBox streak" key={num + 28}>
+            <div className="calBox" key={num + 28}>
               {31 >= num + 28 - offset > 0 && (
                 <div>
                   <p>{num + 28 - offset}</p>
@@ -76,7 +76,7 @@ function Calendar() {
           ))}
         </div>
         <div className="week">
-          <div className="calBox today">
+          <div className="calBox">
             {31 >= 36 - offset > 0 && (
               <div>
                 <p>{36 - offset}</p>

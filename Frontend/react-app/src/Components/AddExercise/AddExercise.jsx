@@ -1,18 +1,20 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./AddExercise.css";
 
 const AddExercise = () => {
-  useEffect(() => {
-    document.title = "Add Exercise";
-  }, []);
+  const navigate = useNavigate();
 
-  // State
+  // UI state
   const [items, setItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState({});
   const [personalBests, setPersonalBests] = useState({});
   const [setsData, setSetsData] = useState({});
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Constant personal best data
+  // Static personal bests
   const personalBestData = {
     1: "150 lbs",
     2: "30 minutes",
@@ -26,70 +28,123 @@ const AddExercise = () => {
 
   // Fetch exercises on mount
   useEffect(() => {
-    fetch("http://192.168.0.12:4000/exercises")
-      .then((res) => res.json())
-      .then((data) => setItems(data))
-      .catch((err) => console.error(err));
-  }, []);
+    const fetchExercises = async () => {
+      const token = localStorage.getItem("token");
 
-  // Toggle expand and initialize data
-  const toggleExpand = (index, workoutId) => {
-    setExpandedItems((prev) => ({ ...prev, [index]: !prev[index] }));
+      try {
+        const response = await axios.get("http://192.168.0.12:4000/exercises", {
+          headers: {},
+          withCredentials: true,
+        });
+        setItems(response.data);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+        } else {
+          setError("Error loading exercises");
+        }
+      }
+    };
 
-    if (!personalBests[workoutId]) {
+    fetchExercises();
+  }, [navigate]);
+
+  const toggleExpand = (id) => {
+    setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }));
+    if (!personalBests[id]) {
       setPersonalBests((prev) => ({
         ...prev,
-        [workoutId]:
-          personalBestData[workoutId] || "No personal best available",
+        [id]: personalBestData[id] || "-",
       }));
     }
-
-    if (!setsData[workoutId]) {
+    if (!setsData[id]) {
       setSetsData((prev) => ({
         ...prev,
-        [workoutId]: [{ setno: 1, weights: 0, repetitions: 0 }],
+        [id]: [{ setno: 1, weights: 0, repetitions: 0 }],
       }));
     }
   };
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await fetch("/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+    navigate("/login");
+  };
 
-  // Add new set row
-  const addSet = (workoutId) => {
+  const addSet = (id) => {
     setSetsData((prev) => {
-      const current = prev[workoutId] || [];
+      const arr = prev[id] || [];
       return {
         ...prev,
-        [workoutId]: [
-          ...current,
-          { setno: current.length + 1, weights: 0, repetitions: 0 },
-        ],
+        [id]: [...arr, { setno: arr.length + 1, weights: 0, repetitions: 0 }],
       };
     });
   };
 
-  // Handle input changes
-  const handleInputChange = (workoutId, setIndex, field, value) => {
+  const handleInputChange = (id, idx, field, value) => {
     setSetsData((prev) => {
-      const arr = [...(prev[workoutId] || [])];
-      arr[setIndex] = { ...arr[setIndex], [field]: Number(value) };
-      return { ...prev, [workoutId]: arr };
+      const arr = [...(prev[id] || [])];
+      arr[idx] = { ...arr[idx], [field]: Number(value) };
+      return { ...prev, [id]: arr };
     });
   };
 
-  // Build payload
-  const handleAddWorkout = () => {
+  const handleAddWorkout = async () => {
+    setError("");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Not authorized. Please log in.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    console.log("all exercise IDs in setsData:", Object.keys(setsData));
     const payload = {
       workouts: Object.entries(setsData).map(([exerciseid, sets]) => ({
         exerciseid: Number(exerciseid),
         sets: sets.map(({ setno, weights, repetitions }) => ({
           setno,
-          repetitions,
           weights,
+          repetitions,
         })),
         created_at: new Date().toISOString(),
       })),
     };
-    console.log(JSON.stringify(payload, null, 2));
-    // send payload to API
+
+    console.log(payload);
+    console.log("→ Posting to /add-workout with headers/payload:", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: payload,
+    });
+
+    setLoading(true);
+    try {
+      await axios.post("http://192.168.0.12:4000/add-workout", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          "session-token": `${token}`,
+        },
+        withCredentials: true,
+      });
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        setError("Session expired. Please log in again.");
+      } else {
+        setError(`Error adding workout: ${err.message}`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -100,30 +155,38 @@ const AddExercise = () => {
           Add Workout
         </a>
         <a href="/profile" style={{ float: "right" }}>
-          {/* profile icon */}
+          Profile
         </a>
-        <a href="/login" style={{ float: "right" }}>
+        <a href="/login" onClick={handleLogout} style={{ float: "right" }}>
           Logout
         </a>
       </div>
+
       <div className="Logo">
         <h1 className="Page-Heading">Select Exercise</h1>
       </div>
+
       <div className="addContainer">
         <div className="selectExercise">
           <h2 className="exeListHead">Exercise List</h2>
-          {items.map((item, index) => {
-            const [id, name] = item;
+          {error && <p className="errorMsg">{error}</p>}
+
+          {items.map((item, idx) => {
+            const id = item.exercise_id ?? item.id ?? idx;
+            const name =
+              item.name ?? item.title ?? item.exerciseName ?? `#${id}`;
+
             return (
-              <div key={index}>
+              <div key={id}>
                 <div
                   className="workouts"
-                  onClick={() => toggleExpand(index, id)}
+                  onClick={() => toggleExpand(id)}
                   style={{ cursor: "pointer" }}
                 >
                   {name}
                 </div>
-                {expandedItems[index] && (
+
+                {expandedItems[id] && (
                   <div className="expandedOptions">
                     <p className="pBest">
                       Personal Best: {personalBests[id] || "Loading..."}
@@ -133,19 +196,14 @@ const AddExercise = () => {
                       <p>KG/s</p>
                       <p>Reps</p>
                     </div>
-                    {setsData[id]?.map((set, setIndex) => (
-                      <div className="workout" key={setIndex}>
+                    {setsData[id]?.map((set, sidx) => (
+                      <div className="workout" key={sidx}>
                         <input
                           className="metrics"
                           type="number"
                           value={set.setno}
                           onChange={(e) =>
-                            handleInputChange(
-                              id,
-                              setIndex,
-                              "setno",
-                              e.target.value
-                            )
+                            handleInputChange(id, sidx, "setno", e.target.value)
                           }
                           min="1"
                         />
@@ -156,7 +214,7 @@ const AddExercise = () => {
                           onChange={(e) =>
                             handleInputChange(
                               id,
-                              setIndex,
+                              sidx,
                               "weights",
                               e.target.value
                             )
@@ -170,7 +228,7 @@ const AddExercise = () => {
                           onChange={(e) =>
                             handleInputChange(
                               id,
-                              setIndex,
+                              sidx,
                               "repetitions",
                               e.target.value
                             )
@@ -187,8 +245,13 @@ const AddExercise = () => {
               </div>
             );
           })}
-          <button className="addButton" onClick={handleAddWorkout}>
-            Add Workout
+
+          <button
+            className="addButton"
+            onClick={handleAddWorkout}
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Add Workout"}
           </button>
         </div>
       </div>

@@ -11,8 +11,9 @@ function Login() {
   const [token, setToken] = useState("");
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const handleLogin = async () => {
+    console.log("sending request!!");
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         "http://192.168.0.12:4000/authenticate",
         {
           email,
@@ -24,14 +25,17 @@ function Login() {
             "Content-Type": "application/json",
           },
           withCredentials: true,
-        }
+        },
+        console.log(token)
       );
-      setToken(response.data.token); // Save JWT token
-      console.log(token);
-      localStorage.setItem("token", response.data.token); // Store in localStorage
+      console.log("🔍 Login response.data:", res.data);
+      console.log("🔑 Available keys:", Object.keys(res.data));
+      localStorage.setItem("token", res.data.session_token);
+      setToken(res.data.session_token);
+      console.log(token); // Store in localStorage
       navigate("/dashboard");
     } catch (error) {
-      alert(error.response?.data || error);
+      alert(error.res?.data || error);
     }
   };
   const handleSignUp = () => {

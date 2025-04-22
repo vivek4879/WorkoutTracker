@@ -23,7 +23,7 @@ const ForgotPass = () => {
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
       <div className="ForgotPass">
-        <div className="header">
+        <div className="Header">
           <h2 className="Page-Heading">Forgot Password?</h2>
         </div>
         <div className="inputs">
