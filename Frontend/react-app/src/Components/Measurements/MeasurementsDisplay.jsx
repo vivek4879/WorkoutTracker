@@ -1,43 +1,37 @@
+
+// src/Components/Measurements/MeasurementsDisplay.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import "../Dashboard/Dashboard.css";            // yellow / black navbar
+import "../Dashboard/Dashboard.css"; // Same CSS as your Dashboard
 
 function MeasurementsDisplay() {
-  const measurements =
-    JSON.parse(localStorage.getItem("userMeasurements")) || {};
+  const measurements = JSON.parse(localStorage.getItem("userMeasurements")) || {};
 
-  /* --------------------------------------------- */
-  /* Navbar is identical to Dashboard.jsx          */
-  /* --------------------------------------------- */
-  const NavBar = () => (
-    <div className="topnav">
-      <a className="active" href="/dashboard">
-        Home
-      </a>
-      <a href="/addexercise">Add Workout</a>
-
-      {/* right‑aligned links */}
-      <Link style={{ float: "right" }} to="/login">
-        Logout
-      </Link>
-      <Link style={{ float: "right" }} to="/profile">
-        Profile
-      </Link>
-      <Link style={{ float: "right" }} to="/measurements">
-        Measurements
-      </Link>
-    </div>
-  );
-
-  /* If no data found */
+  // If no measurements found
   if (Object.keys(measurements).length === 0) {
     return (
       <div className="container">
-        <NavBar />
+        <div className="topnav">
+          <a className="active" href="#">
+            Home
+          </a>
+          <a href="#">Add Workout</a>
+          <Link style={{ float: "right" }} to="/login">
+            Logout
+          </Link>
+          <Link style={{ float: "right" }} to="/profile">
+            Profile
+          </Link>
+        
+          <Link style={{ float: "right" }} to="/measurements">
+            Measurements
+          </Link>
+        </div>
 
         <div className="Logo">
           <h1 className="Page-Heading">Gambare!</h1>
         </div>
+
         <div className="header">
           <h2 className="Page-Heading">Your Measurements</h2>
         </div>
@@ -47,38 +41,55 @@ function MeasurementsDisplay() {
             width: "90%",
             maxWidth: "500px",
             margin: "0 auto 40px auto",
-            background: "#fff",
+            backgroundColor: "#fff",
             borderRadius: "8px",
             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
             padding: "20px",
-            textAlign: "center",
-            color: "#333",
           }}
         >
-          No measurements found. Please enter them first.
+          <p style={{ color: "#333" }}>No measurements found. Please enter them first.</p>
         </div>
       </div>
     );
   }
 
-  /* Show table of saved measurements */
+  // If measurements exist
   return (
     <div className="container">
-      <NavBar />
+      <div className="topnav">
+        <a className="active" href="#">
+          Home
+        </a>
+        <a href="#">Add Workout</a>
+        <Link style={{ float: "right" }} to="/login">
+          Logout
+        </Link>
+        <Link style={{ float: "right" }} to="/profile">
+          Profile
+        </Link>
+        <Link style={{ float: "right" }} to="/usergoals">
+          UserGoal
+        </Link>
+        <Link style={{ float: "right" }} to="/measurements">
+          Measurements
+        </Link>
+      </div>
 
       <div className="Logo">
         <h1 className="Page-Heading">Gambare!</h1>
       </div>
+
       <div className="header">
         <h2 className="Page-Heading">Your Measurements</h2>
       </div>
 
+      {/* White Box to show the table */}
       <div
         style={{
           width: "90%",
           maxWidth: "500px",
           margin: "0 auto 40px auto",
-          background: "#fff",
+          backgroundColor: "#fff",
           borderRadius: "8px",
           boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
           padding: "20px",
@@ -88,11 +99,11 @@ function MeasurementsDisplay() {
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            color: "#333",
+            color: "#333" /* ensures text is dark */,
           }}
         >
           <thead>
-            <tr style={{ background: "#f5f5f5" }}>
+            <tr style={{ backgroundColor: "#f5f5f5" }}>
               <th
                 style={{
                   textAlign: "left",
@@ -115,14 +126,10 @@ function MeasurementsDisplay() {
           </thead>
           <tbody>
             {Object.entries(measurements).map(([key, value]) => {
-              /* Convert camelCase → Title Case (Right Bicep, Upper Abs, …) */
+              // Convert "rightBicep" to "Right Bicep"
               const label =
                 key.charAt(0).toUpperCase() +
-                key
-                  .slice(1)
-                  .replace(/([A-Z])/g, " $1")
-                  .replace("Upper Abs", "Upper Abs")
-                  .replace("Lower Abs", "Lower Abs");
+                key.slice(1).replace(/([A-Z])/g, " $1");
               return (
                 <tr key={key}>
                   <td
