@@ -4,6 +4,7 @@ import (
 	internal "WorkoutTracker/internal/database"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/stretchr/testify/mock"
 	"log"
 	"net/http"
@@ -367,5 +368,44 @@ func TestGetStreakDataHandler(t *testing.T) {
 		t.Errorf("Expected maxStreak %v, got %v", mockStreak.MaxStreak, response["maxStreak"])
 	}
 
+	mockUserModel.AssertExpectations(t)
+}
+
+// Unhappy Path tests
+func TestGetAllExercisesHandler_DBError(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Simulate database failure
+	mockUserModel.On("GetAllExercises").Return([]internal.Exercises(nil), errors.New("database error"))
+
+	// Setup app
+	mockModels := internal.Models{UserModel: mockUserModel}
+	app := application{Models: mockModels}
+
+	// Create request
+	req := httptest.NewRequest("GET", "/exercises", nil)
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	app.GetAllExercisesHandler(rec, req)
+
+	// Check response code
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Parse error response
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON error response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expectedError := "Failed to retrieve exercises"
+	if response["error"] != expectedError {
+		t.Errorf("Expected error message %q, got %q", expectedError, response["error"])
+	}
+
+	// Check mock expectations
 	mockUserModel.AssertExpectations(t)
 }
