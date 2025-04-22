@@ -34,11 +34,12 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	match, err := app.PasswordHasher.Compare(input.Password, user.Password)
-	if err != nil {
-		app.sendErrorResponse(w, http.StatusUnauthorized, "error:Invalid email or password")
-		log.Printf("Incorrect Password for user: %s ", user.Email)
+	if err != nil || !match {
+		app.sendErrorResponse(w, http.StatusUnauthorized, "Invalid email or password")
+		log.Printf("Authentication failed for user: %s (match: %t, err: %v)", user.Email, match, err)
 		return
 	}
+
 	log.Printf("User %s matches %t ", user.Email, match)
 	//Create new random session token
 	sessionToken := uuid.NewString()
@@ -61,6 +62,7 @@ func (app *application) AuthenticationHandler(w http.ResponseWriter, r *http.Req
 		Value:    sessionToken,
 		Expires:  expiresAt,
 		HttpOnly: true,
+		Path:     "/",
 	}
 	http.SetCookie(w, &cookie)
 	response := map[string]string{

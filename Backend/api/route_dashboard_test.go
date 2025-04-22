@@ -4,6 +4,7 @@ import (
 	internal "WorkoutTracker/internal/database"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/stretchr/testify/mock"
 	"log"
 	"net/http"
@@ -365,6 +366,279 @@ func TestGetStreakDataHandler(t *testing.T) {
 	}
 	if response["maxStreak"] != float64(mockStreak.MaxStreak) {
 		t.Errorf("Expected maxStreak %v, got %v", mockStreak.MaxStreak, response["maxStreak"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
+
+// Unhappy Path tests
+func TestGetAllExercisesHandler_DBError(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Simulate database failure
+	mockUserModel.On("GetAllExercises").Return([]internal.Exercises(nil), errors.New("database error"))
+
+	// Setup app
+	mockModels := internal.Models{UserModel: mockUserModel}
+	app := application{Models: mockModels}
+
+	// Create request
+	req := httptest.NewRequest("GET", "/exercises", nil)
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	app.GetAllExercisesHandler(rec, req)
+
+	// Check response code
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Parse error response
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse JSON error response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expectedError := "Failed to retrieve exercises"
+	if response["error"] != expectedError {
+		t.Errorf("Expected error message %q, got %q", expectedError, response["error"])
+	}
+
+	// Check mock expectations
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestDashboardHandler_InvalidTokenInDB(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Return error when QuerySession is called with token
+	mockUserModel.On("QuerySession", "invalid-token").Return(nil, errors.New("invalid session"))
+
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return nil, errors.New("invalid session")
+		},
+	}
+
+	req := httptest.NewRequest("GET", "/dashboard", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "invalid-token"})
+
+	rec := httptest.NewRecorder()
+
+	mockApp.DashboardHandler(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected 401 Unauthorized, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response")
+	}
+
+	if response["error"] != "Unauthorized: Invalid session" {
+		t.Errorf("Expected error message 'Unauthorized: invalid session', got %q", response["error"])
+	}
+}
+
+func TestDashboardHandler_MissingSessionCookie(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return nil, errors.New("no session token cookie")
+		},
+	}
+
+	req := httptest.NewRequest("GET", "/dashboard", nil)
+	rec := httptest.NewRecorder()
+
+	mockApp.DashboardHandler(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Errorf("Expected 401 Unauthorized, got %d", rec.Code)
+	}
+
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal("Failed to parse response")
+	}
+
+	if response["error"] != "Unauthorized: Invalid session" {
+		t.Errorf("Expected error 'Unauthorized: session token missing or invalid', got %q", response["error"])
+	}
+}
+
+func TestAddWorkoutHandler_InsertWorkoutFails(t *testing.T) {
+	const userID uint = 1
+	mockUserModel := new(MockUserModel)
+	mockSession := &internal.Sessions{UserID: userID}
+	exerciseID := uint(101)
+
+	workoutData := []internal.ExerciseData{
+		{
+			ExerciseId: exerciseID,
+			Sets: []internal.WorkoutSet{
+				{SetNo: 1, Repetitions: 10, Weight: 50},
+			},
+		},
+	}
+
+	// Set expectations
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+	mockUserModel.On("InsertWorkout", userID, workoutData).Return(nil, errors.New("insert workout failed"))
+
+	app := application{
+		Models: internal.Models{UserModel: mockUserModel},
+	}
+
+	reqBody := map[string]interface{}{
+		"workouts": workoutData,
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest("POST", "/add-workout", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+	rec := httptest.NewRecorder()
+
+	app.AddWorkoutHandler(rec, req)
+
+	// Assert HTTP 500 status
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Assert error response body
+	var resp map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &resp)
+	if err != nil {
+		t.Fatalf("Failed to parse response JSON: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expected := "Internal Server Error"
+	if resp["error"] != expected {
+		t.Errorf("Expected error message %q, got %q", expected, resp["error"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestAddHandler_QueryUserBestFails(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Mock session
+	mockSession := &internal.Sessions{UserID: 2}
+	mockExerciseID := uint(111)
+
+	// Mock QuerySession to return valid session
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+
+	// Simulate DB error on QueryUserBest
+	mockUserModel.On("QueryUserBest", mockSession.UserID, mockExerciseID).Return(0.0, 0.0, errors.New("db error"))
+
+	// Setup mock application with session handler
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return mockSession, nil
+		},
+	}
+
+	// Create request with query param: ?exercise_id=111
+	req := httptest.NewRequest("GET", "/user-best?exercise_id=111", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+
+	// Create response recorder
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	mockApp.AddHandler(rec, req)
+
+	// Assert status code
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Assert error message in response
+	var response map[string]string
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatalf("Failed to parse error response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expectedError := "Failed to retrieve user's best"
+	if response["error"] != expectedError {
+		t.Errorf("Expected error message %q, got %q", expectedError, response["error"])
+	}
+
+	mockUserModel.AssertExpectations(t)
+}
+
+func TestGetStreakDataHandler_FetchStreakFails(t *testing.T) {
+	mockUserModel := new(MockUserModel)
+
+	// Mock session
+	mockSession := &internal.Sessions{UserID: 3}
+
+	// Mock QuerySession to return valid session
+	mockUserModel.On("QuerySession", "mock-session-token").Return(mockSession, nil)
+
+	// Simulate FetchStreakData failure
+	mockUserModel.On("FetchStreakData", mockSession.UserID).Return(nil, errors.New("streak not found"))
+
+	// Setup mock app with mocked session
+	mockApp := &MockApplication{
+		application: application{
+			Models: internal.Models{
+				UserModel: mockUserModel,
+			},
+		},
+		MockSession: func(w http.ResponseWriter, r *http.Request) (*internal.Sessions, error) {
+			return mockSession, nil
+		},
+	}
+
+	// Create GET request with session cookie
+	req := httptest.NewRequest("GET", "/streak", nil)
+	req.AddCookie(&http.Cookie{Name: "session_token", Value: "mock-session-token"})
+	rec := httptest.NewRecorder()
+
+	// Call the handler
+	mockApp.GetStreakDataHandler(rec, req)
+
+	// Assert status code
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", rec.Code)
+	}
+
+	// Assert error response
+	var response map[string]string
+	if err := json.Unmarshal(rec.Body.Bytes(), &response); err != nil {
+		t.Fatalf("Failed to parse JSON response: %v\nBody: %s", err, rec.Body.String())
+	}
+
+	expectedError := "Internal Server Error"
+	if response["error"] != expectedError {
+		t.Errorf("Expected error message %q, got %q", expectedError, response["error"])
 	}
 
 	mockUserModel.AssertExpectations(t)
