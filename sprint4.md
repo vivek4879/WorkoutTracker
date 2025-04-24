@@ -1,4 +1,4 @@
-## Detail work completed in Sprint 3
+## Detail work completed in Sprint 4
 
 ### 1. Frontend
 
@@ -98,7 +98,83 @@ In this sprint, we delivered several new UI components, enhanced existing pages,
 
 ---
 
-# Frontend Testing Matrix
+
+
+
+
+### 2. Backend
+
+In this sprint, several important APIs were added and some updated to enhance user interaction with the application. The updated and new APIs focus on measurements,user performance tracking, exercise management, and updating the streaks for the user and showing the same on the front end. Additionally, significant updates were made to some existing tests and extensive unhappy path tests were also added.
+
+<b>2.1. Streak Data:</b> This API returns the user's streak data so that it could be displayed on the dashboard. It helps to keep the dashboard updated for the user.
+
+<b>Key Functionality:</b>
+
+- The calendar on the dashboard gets updated using this API. This way the user will know about the current streak and the max streak.
+
+- Validates session to ensure only authorized users are able to see streaks.
+
+- Returns success or error messages based on the outcome.
+
+In addition to this, various tests were added for extensive testing which will be discussed in the tests section.
+
+### Summary of Changes in This Sprint:
+
+- Streak Data Management: Worked on streak data management for seamless display of streak data for the user. This will help the user to stay motivated.
+
+- User Data Management: APIs for updating and retrieving user measurements (update-measurements, get-measurements) were improved enabling users to track fitness metrics.
+
+- Extensive testing for various paths.
+
+These improvements add more value to the platform by making it easier for users to track their progress, keep motivated through streaks, and enhance their workout experience.
+
+## Unit Tests for FrontEnd
+#### 1. WorkoutList Component (WorkoutList.spec.js)
+
+1. Renders one `<li>` per workout day from props/state
+2. Toggles exercise details when a day header is clicked
+3. Updates internal state when “Sets” dropdown changes
+4. Updates internal state when “Reps” dropdown changes
+5. Applies correct ARIA attributes for expanded/collapsed state
+
+#### 2. StreakCalendar Component (StreakCalendar.spec.js)
+
+1. Displays loading indicator before data arrives
+2. Fetches streak data on mount and renders current/max streak
+3. Shows an error message if the API returns a 4xx/5xx
+4. Updates highlighted dates when new streak data is pushed
+
+#### 3. MeasurementsForm Component (MeasurementsForm.spec.js)
+
+1. Fetches and pre‑fills existing measurements on mount
+2. Validates numeric inputs (e.g. weight > 0, body fat 0–100)
+3. Submits updated measurements and shows a success toast
+4. Handles and displays API errors on submission failure
+5. Disables submit button while request is in flight
+
+#### 4. LoginForm Component (LoginForm.spec.js)
+
+1. Renders email and password fields plus submit button
+2. Validates that both fields are required
+3. Calls login API with correct payload on submit
+4. Redirects to dashboard on successful login
+5. Displays error message on authentication failure
+
+#### 5. SignupForm Component (SignupForm.spec.js)
+
+1. Renders first name, last name, email, password, and submit button
+2. Validates required fields and email format
+3. Calls signup API with correct payload
+4. Redirects or shows confirmation on success
+5. Displays server‑side validation errors (e.g. “email already exists”)
+
+#### 6. UserProfile Component (UserProfile.spec.js)
+
+1. Renders user’s name and basic info from context/store
+2. Renders list of past workouts via `WorkoutList`
+3. Renders measurements via `MeasurementsForm`
+4. Allows logout and redirects to login on click
+5. Displays loading and error states for profile data fetch
 
 ---
 
@@ -157,86 +233,6 @@ In this sprint, we delivered several new UI components, enhanced existing pages,
 4. Should check if Home navigation works
 
 ---
-
-## Unit Tests for Frontend Components
-
-#### 1. WorkoutList Component (WorkoutList.spec.js)
-
-1. Renders one `<li>` per workout day from props/state
-2. Toggles exercise details when a day header is clicked
-3. Updates internal state when “Sets” dropdown changes
-4. Updates internal state when “Reps” dropdown changes
-5. Applies correct ARIA attributes for expanded/collapsed state
-
-#### 2. StreakCalendar Component (StreakCalendar.spec.js)
-
-1. Displays loading indicator before data arrives
-2. Fetches streak data on mount and renders current/max streak
-3. Shows an error message if the API returns a 4xx/5xx
-4. Updates highlighted dates when new streak data is pushed
-
-#### 3. MeasurementsForm Component (MeasurementsForm.spec.js)
-
-1. Fetches and pre‑fills existing measurements on mount
-2. Validates numeric inputs (e.g. weight > 0, body fat 0–100)
-3. Submits updated measurements and shows a success toast
-4. Handles and displays API errors on submission failure
-5. Disables submit button while request is in flight
-
-#### 4. LoginForm Component (LoginForm.spec.js)
-
-1. Renders email and password fields plus submit button
-2. Validates that both fields are required
-3. Calls login API with correct payload on submit
-4. Redirects to dashboard on successful login
-5. Displays error message on authentication failure
-
-#### 5. SignupForm Component (SignupForm.spec.js)
-
-1. Renders first name, last name, email, password, and submit button
-2. Validates required fields and email format
-3. Calls signup API with correct payload
-4. Redirects or shows confirmation on success
-5. Displays server‑side validation errors (e.g. “email already exists”)
-
-#### 6. UserProfile Component (UserProfile.spec.js)
-
-1. Renders user’s name and basic info from context/store
-2. Renders list of past workouts via `WorkoutList`
-3. Renders measurements via `MeasurementsForm`
-4. Allows logout and redirects to login on click
-5. Displays loading and error states for profile data fetch
-
----
-
-### 2. Backend
-
-In this sprint, several important APIs were added and some updated to enhance user interaction with the application. The updated and new APIs focus on measurements,user performance tracking, exercise management, and updating the streaks for the user and showing the same on the front end. Additionally, significant updates were made to some existing tests and extensive unhappy path tests were also added.
-
-<b>2.1. Streak Data:</b> This API returns the user's streak data so that it could be displayed on the dashboard. It helps to keep the dashboard updated for the user.
-
-<b>Key Functionality:</b>
-
-- The calendar on the dashboard gets updated using this API. This way the user will know about the current streak and the max streak.
-
-- Validates session to ensure only authorized users are able to see streaks.
-
-- Returns success or error messages based on the outcome.
-
-In addition to this, various tests were added for extensive testing which will be discussed in the tests section.
-
-### Summary of Changes in This Sprint:
-
-- Streak Data Management: Worked on streak data management for seamless display of streak data for the user. This will help the user to stay motivated.
-
-- User Data Management: APIs for updating and retrieving user measurements (update-measurements, get-measurements) were improved enabling users to track fitness metrics.
-
-- Extensive testing for various paths.
-
-These improvements add more value to the platform by making it easier for users to track their progress, keep motivated through streaks, and enhance their workout experience.
-
-## Unit Tests for FrontEnd
-
 ## Unit tests for backend
 
 #### 1. Access Tests (in route_access_test.go)
