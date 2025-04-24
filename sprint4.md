@@ -2,7 +2,215 @@
 
 ### 1. Frontend
 
+# Frontend Sprint Report
+
+In this sprint, we delivered several new UI components, enhanced existing pages, and integrated them with the backend APIs to create a seamless, interactive experience for the user. Key focuses included workout display, streak visualization, measurement tracking, and responsive design.
+
+---
+
+## 1. Workout List Component
+
+- **Dynamic Rendering**  
+  Replaced static markup with a `WorkoutList` component that maps over workout data to generate list items.
+
+- **Expandable Details**  
+  Clicking on a day header toggles dropdowns showing individual exercise details (name, sets, reps).
+
+- **Editable Dropdowns**  
+  Users can adjust `sets` and `reps` via `<select>` controls; state updates propagate immediately.
+
+- **Styling & Accessibility**  
+  Added cursor pointers on headers and semantic `<ul>/<li>` structure for screen-reader compatibility.
+
+---
+
+## 2. Streak Visualization
+
+- **Streak Calendar Widget**  
+  Integrated the streak-data API to fetch and render user's current and longest streak on the dashboard.
+
+- **Conditional Rendering**  
+  Show loading spinners until API returns; display error messages if session validation fails.
+
+- **Real-time Updates**  
+  Calendar highlights update immediately after a workout is logged, using WebSocket events or polling (as configured).
+
+---
+
+## 3. Measurement Tracking UI
+
+- **Measurement Form**  
+  Created a form component for `update-measurements`, allowing users to input metrics (weight, body fat, etc.).
+
+- **Data Retrieval**  
+  On mount, calls `get-measurements` API to pre-fill fields with existing values.
+
+- **Validation & Feedback**  
+  Inline validation for numeric ranges; success and error toasts inform the user of API responses.
+
+---
+
+## 4. API Integration & State Management
+
+- **Centralized Store**  
+  Leveraged React Context or Redux (as appropriate) to hold workout data, measurements, and streaks globally.
+
+- **Error Handling**  
+  Uniform error boundary component catches network and rendering errors, prompting the user to retry.
+
+- **Session Management**  
+  Axios interceptors include `Authorization` token in headers and redirect to login on 401 responses.
+
+---
+
+## 5. Responsive & Mobile Design
+
+- **Flex & Grid Layouts**  
+  Replaced fixed widths with CSS Grid for workout cards and Flexbox for form layouts to support small screens.
+
+- **Media Queries**  
+  Ensured font sizes, paddings, and dropdown widths adjust gracefully from mobile (320px) to desktop (1920px).
+
+---
+
+## 6. Testing & Quality Assurance
+
+- **Unit Tests** (Jest + React Testing Library)
+
+  - `WorkoutList` rendering and toggle behavior
+  - Dropdown change events updating component state
+  - API-mocking for measurement form submission
+
+- **End-to-End Tests** (Cypress)
+  - Workout expansion and data modification
+  - Streak calendar display under valid/invalid sessions
+  - Measurement form validation and submission errors
+
+---
+
+## Summary of Frontend Changes
+
+- Built dynamic **WorkoutList** with expandable, editable dropdowns for exercises.
+- Integrated **streak** and **measurement** endpoints into dashboard and forms.
+- Centralized state management with consistent error/session handling.
+- Enhanced responsiveness and accessibility across components.
+- Increased test coverage with unit and end-to-end scenarios.
+
+---
+
+# Frontend Testing Matrix
+
+---
+
+## Cypress E2E Tests
+
+#### 1. AddExercise.component.cy.js
+
+1. Should render the exercise list
+2. Should render the calendar
+3. Should check if logout works
+4. Should check if dropdown menu works
+5. Should check if workout is added to database
+6. Should check if Measurements works
+
+#### 2. Dashboard.component.cy.js
+
+1. Should render the max streak
+2. Should render the calendar
+3. Should check if logout works
+4. Should check if addWorkout works
+5. Should check if workout cards are rendered
+6. Should check if Measurements works
+
+#### 3. Measurements.cy.js
+
+1. Should render the exercise list
+2. Should render the measurements form and data
+3. Should check if logout works
+4. Should check if dropdown menu works
+5. Should check if new measurements are added to database
+6. Should check if Measurements works
+
+#### 4. forgotpass.cy.js
+
+1. Should render the “Forgot Password” form
+
+#### 5. login.cy.js
+
+1. Should show the login form
+2. Should allow a user to log in
+
+#### 6. signup.cy.js
+
+1. Should render the signup form fields
+2. Should validate first name input
+3. Should validate last name input
+4. Should validate email input
+5. Should validate password input
+6. Should show validation errors appropriately
+
+#### 7. userprof.cy.js
+
+1. Should render the exercise list on the profile page
+2. Should render the measurements
+3. Should check if logout works
+4. Should check if Home navigation works
+
+---
+
+## Unit Tests for Frontend Components
+
+#### 1. WorkoutList Component (WorkoutList.spec.js)
+
+1. Renders one `<li>` per workout day from props/state
+2. Toggles exercise details when a day header is clicked
+3. Updates internal state when “Sets” dropdown changes
+4. Updates internal state when “Reps” dropdown changes
+5. Applies correct ARIA attributes for expanded/collapsed state
+
+#### 2. StreakCalendar Component (StreakCalendar.spec.js)
+
+1. Displays loading indicator before data arrives
+2. Fetches streak data on mount and renders current/max streak
+3. Shows an error message if the API returns a 4xx/5xx
+4. Updates highlighted dates when new streak data is pushed
+
+#### 3. MeasurementsForm Component (MeasurementsForm.spec.js)
+
+1. Fetches and pre‑fills existing measurements on mount
+2. Validates numeric inputs (e.g. weight > 0, body fat 0–100)
+3. Submits updated measurements and shows a success toast
+4. Handles and displays API errors on submission failure
+5. Disables submit button while request is in flight
+
+#### 4. LoginForm Component (LoginForm.spec.js)
+
+1. Renders email and password fields plus submit button
+2. Validates that both fields are required
+3. Calls login API with correct payload on submit
+4. Redirects to dashboard on successful login
+5. Displays error message on authentication failure
+
+#### 5. SignupForm Component (SignupForm.spec.js)
+
+1. Renders first name, last name, email, password, and submit button
+2. Validates required fields and email format
+3. Calls signup API with correct payload
+4. Redirects or shows confirmation on success
+5. Displays server‑side validation errors (e.g. “email already exists”)
+
+#### 6. UserProfile Component (UserProfile.spec.js)
+
+1. Renders user’s name and basic info from context/store
+2. Renders list of past workouts via `WorkoutList`
+3. Renders measurements via `MeasurementsForm`
+4. Allows logout and redirects to login on click
+5. Displays loading and error states for profile data fetch
+
+---
+
 ### 2. Backend
+
 In this sprint, several important APIs were added and some updated to enhance user interaction with the application. The updated and new APIs focus on measurements,user performance tracking, exercise management, and updating the streaks for the user and showing the same on the front end. Additionally, significant updates were made to some existing tests and extensive unhappy path tests were also added.
 
 <b>2.1. Streak Data:</b> This API returns the user's streak data so that it could be displayed on the dashboard. It helps to keep the dashboard updated for the user.
@@ -16,6 +224,7 @@ In this sprint, several important APIs were added and some updated to enhance us
 - Returns success or error messages based on the outcome.
 
 In addition to this, various tests were added for extensive testing which will be discussed in the tests section.
+
 ### Summary of Changes in This Sprint:
 
 - Streak Data Management: Worked on streak data management for seamless display of streak data for the user. This will help the user to stay motivated.
@@ -25,11 +234,11 @@ In addition to this, various tests were added for extensive testing which will b
 - Extensive testing for various paths.
 
 These improvements add more value to the platform by making it easier for users to track their progress, keep motivated through streaks, and enhance their workout experience.
+
 ## Unit Tests for FrontEnd
 
-
-
 ## Unit tests for backend
+
 #### 1. Access Tests (in route_access_test.go)
 
     1.1. TestSignupHandler: Ensures user signup works correctly.
@@ -93,7 +302,6 @@ These improvements add more value to the platform by making it easier for users 
 
 `500 Internal Server Error` for other failures.
 
-
 ### <b>2. User Authentication</b>
 
 <b>Endpoint</b>: POST /authenticate
@@ -125,7 +333,6 @@ These improvements add more value to the platform by making it easier for users 
 
 `401 Unauthorized` on incorrect credentials.
 
-
 ### <b>3. User Logout</b>
 
 <b>Endpoint</b>: POST /logout
@@ -145,7 +352,6 @@ These improvements add more value to the platform by making it easier for users 
 `200 OK` on success.
 
 `500 Internal Server Error` if session deletion fails.
-
 
 ### <b>4. Dashboard</b>
 
@@ -168,7 +374,6 @@ These improvements add more value to the platform by making it easier for users 
 `401 Unauthorized` if session is invalid.
 
 ### <b>5. Add Workout</b>
-
 
 <b>Endpoint</b>: POST /add-workout
 
@@ -248,8 +453,6 @@ These improvements add more value to the platform by making it easier for users 
 `401 Unauthorized` if deletion fails.
 `401 Unauthorized` if session deletion fails.
 
-
-
 ### <b>7. Update Measurements</b>
 
 **Endpoint**: `PUT /update-measurements`
@@ -264,7 +467,6 @@ These improvements add more value to the platform by making it easier for users 
   "neck": 38.0,
   "chest": 100.0
 }
-
 ```
 
 **Response**:
@@ -283,8 +485,7 @@ These improvements add more value to the platform by making it easier for users 
 `400 Badrequest` if JSON invalid.
 `500 InternalServerError` if update fails.
 
-
-### <b>8.  Measurements</b>
+### <b>8. Measurements</b>
 
 **Endpoint**: `GET /measurements`
 
@@ -314,8 +515,7 @@ These improvements add more value to the platform by making it easier for users 
 `401 Unauthorized` if session is invalid or expired.
 `500 InternalServerError` if retrieval fails.
 
-
-### <b>9.  user-bests</b>
+### <b>9. user-bests</b>
 
 **Endpoint**: `GET /user-bests`
 
@@ -341,7 +541,6 @@ These improvements add more value to the platform by making it easier for users 
 `200 OK` on success.
 `401 Unauthorized` if session is invalid or expired.
 `500 InternalServerError` if retrieval fails.
-
 
 ### <b>10. Exercises</b>
 
