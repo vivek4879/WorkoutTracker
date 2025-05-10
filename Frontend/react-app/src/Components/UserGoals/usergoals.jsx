@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+
 import "./usergoals.css"; // Optional: style separately
 import { Link } from "react-router-dom";
 

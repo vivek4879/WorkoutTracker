@@ -1,3 +1,4 @@
+
 // src/Components/Measurements/MeasurementsForm.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,7 +18,7 @@ function MeasurementsForm() {
 
   const handleSubmit = () => {
     localStorage.setItem("userMeasurements", JSON.stringify(measurements));
-    navigate("/measurements/view");
+    navigate("/measurements/display");
   };
 
   return (

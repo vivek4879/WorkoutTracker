@@ -1,131 +1,59 @@
-.topnav {
-    background-color: #ffeb00;
-    width: 100%;
-  }
-  .topnav a {
-    float: left;
-    color: #000000;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-  }
-  
-  /* Change the color of links on hover */
-  .topnav a:hover {
-    background-color: #606060;
-    color: black;
-  }
-  
-  /* Add a color to the active/current link */
-  .topnav a.active {
-    background-color: #323232;
-    color: white;
-  }
-  .calContainer {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-  }
-  .calendar {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    min-width: 280px;
-    min-height: 200px;
-    color: #000000;
-  }
-  .week {
-    display: flex;
-  }
-  .calBox {
-    /* border: 1px, solid black; */
-    min-width: 60px;
-    min-height: 34px;
-    font-size: 18px;
-    color: #000000;
-    margin: auto;
-    padding: auto;
-  }
-  .dayBox {
-    border: none;
-    font-size: 15px;
-  }
-  
-  .calBox.active {
-  }
-  
-  .calBox.today {
-    color: red;
-  }
-  .profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* height: 100vh; */
-    padding: 20px;
-    background-color: #f3fcff;
-  }
-  
-  .profile-card {
-    background: #ffffff;
-    padding: 20px 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .profile-header {
-    display: flex;
-    align-items: center;
-  }
-  
-  .profile-image-container {
-    position: relative;
-    margin-right: 20px;
-  }
-  
-  .profile-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-  }
-  
-  .edit-profile-btn {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #007bff;
-    color: #000000;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .edit-profile-btn:hover {
-    background-color: #0056b3;
-  }
-  
-  .profile-info {
-    flex: 1;
-  }
-  
-  .profile-name {
-    color: black;
-    font-size: 22px;
-    font-weight: bold;
-    margin: 5px 0;
-  }
-  
-  .profile-details {
-    font-size: 14px;
-    color: rgb(14, 16, 17);
-    margin-bottom: 5px;
-  }
-  
-  .profile-bio {
-    font-size: 16px;
-  }
-  
+/* ───────── profile page layout ───────── */
+
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px 20px;
+  background-color: #f3fcff;
+}
+
+.profile-card {
+  background: #ffffff;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+/* ───────── form inside the card ───────── */
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #000;
+  font-size: 14px;
+}
+
+.profile-form input {
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* ───────── save button ───────── */
+
+.save-btn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #323232;   /* matches “active” link colour */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.save-btn:hover {
+  background-color: #505050;
+}
+
+/* ───────── end of file ───────── */
